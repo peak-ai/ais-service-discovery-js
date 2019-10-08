@@ -1,6 +1,6 @@
 {
   "name": "@peak-ai/ais-service-discovery",
-  "version": "0.0.13-alpha",
+  "version": "0.0.14",
   "main": "src/index.js",
   "repository": "git@github.com:PeakBI/ais-service-discovery.git",
   "author": "<ewan.valentine@peak.ai>",
