@@ -1,6 +1,8 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const { omit } = require('ramda');
+
 const { defaultNamespace, extractServiceParts } = require('./helpers/call-service-helper');
 
 const lambda = new AWS.Lambda();
@@ -60,13 +62,13 @@ const runService = (service, body, opts = {}) => {
       if (opts.subscribe) {
         return queue.listen(url);
       }
-      return queue.send(url, body);
+      return queue.send(url, body, omit(['subscribe'], opts));
     }
 
     case 'event':
     case 'pubsub':
     case 'sns': {
-      return publisher.publish(arn, body);
+      return publisher.publish(arn, body, omit(['subscribe', opts]));
     }
 
     default: {
@@ -131,7 +133,7 @@ const subscribe = (serviceID, opts = {}) => {
 module.exports = {
   call: callService,
 
-  // Syncronous
+  // Synchronous
   request,
 
   // Events
