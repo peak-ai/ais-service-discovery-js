@@ -108,14 +108,15 @@ describe('(call)', () => {
     const namespaceQueue = `${namespace}.${queue}`;
     const message = { name: 'test' };
     const mockMessageId = 'abc123';
+    const opts = { MessageGroupId: 'abc123', MessageDeduplicationId: 'abc123' };
 
     CloudmapAdapter.prototype.discover = jest.fn().mockReturnValue(Promise.resolve(sqsService));
     SQS.prototype.send = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: mockMessageId,
     }));
 
-    const { MessageId } = await ServiceDiscovery.queue(namespaceQueue, message);
-    expect(SQS.prototype.send).toBeCalledWith(queue, message);
+    const { MessageId } = await ServiceDiscovery.queue(namespaceQueue, message, opts);
+    expect(SQS.prototype.send).toBeCalledWith(queue, message, opts);
     expect(MessageId).toEqual(mockMessageId);
 
     const mockDelete = jest.fn();

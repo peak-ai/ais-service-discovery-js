@@ -7,10 +7,11 @@ class SQS {
     this.opts = opts;
   }
 
-  send(name, event) {
+  send(name, event, opts = {}) {
     return this.client.sendMessage({
       QueueUrl: name,
       MessageBody: JSON.stringify(event),
+      ...opts,
     }).promise();
   }
 

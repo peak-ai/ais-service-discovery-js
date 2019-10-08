@@ -31,8 +31,8 @@ class Queue extends EventEmitter {
     this.opts = opts;
   }
 
-  send(name, message) {
-    return this.adapter.send(name, message);
+  send(name, message, opts = {}) {
+    return this.adapter.send(name, message, opts);
   }
 
   async listen(name) {
