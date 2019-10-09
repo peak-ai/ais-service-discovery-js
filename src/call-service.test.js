@@ -21,15 +21,23 @@ describe('(call)', () => {
 
   const lambdaService = {
     Instances: [{
+      Id: 'my-func',
       Attributes: {
-        type: 'lambda',
+        type: 'function',
         arn: 'my-test-arn',
+      },
+    }, {
+      Id: 'nope',
+      Attributes: {
+        type: 'function',
+        arn: 'ExampleArn',
       },
     }],
   };
 
   const stateMachineService = {
     Instances: [{
+      Id: 'state-machine',
       Attributes: {
         type: 'state-machine',
         arn: 'my-test-arn',
@@ -39,6 +47,13 @@ describe('(call)', () => {
 
   const automationService = {
     Instances: [{
+      Id: 'other',
+      Attributes: {
+        type: 'something-else',
+        arn: 'ExampleArn',
+      },
+    }, {
+      Id: 'test',
       Attributes: {
         type: 'automation',
         arn: 'ExampleDocumentName',
@@ -48,6 +63,7 @@ describe('(call)', () => {
 
   const snsService = {
     Instances: [{
+      Id: 'test-topic',
       Attributes: {
         type: 'sns',
         arn: 'test-topic',
@@ -57,6 +73,7 @@ describe('(call)', () => {
 
   const sqsService = {
     Instances: [{
+      Id: 'sqs',
       Attributes: {
         type: 'queue',
         url: 'test-queue',
@@ -84,7 +101,7 @@ describe('(call)', () => {
     LambdaAdapter.prototype.call = jest.fn().mockImplementation(() => Promise.resolve(expected));
     expect.assertions(1);
     const body = { name: 'Ewan' };
-    const res = await ServiceDiscovery.request('test-service.my-func', body);
+    const res = await ServiceDiscovery.request('test-service->my-func', body);
     expect(res).toEqual(expected);
   });
 
@@ -94,7 +111,9 @@ describe('(call)', () => {
     SNS.prototype.publish = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: messageId,
     }));
+
     expect.assertions(2);
+
     const event = { name: 'Test' };
     const res = await ServiceDiscovery.publish('test-namespace.test-topic', event);
     expect(SNS.prototype.publish).toBeCalledWith('test-topic', event);
@@ -175,6 +194,7 @@ describe('(call)', () => {
       handler: 'test',
       body,
     });
+
     expect(result).toEqual(expected);
     done();
   });
@@ -191,6 +211,7 @@ describe('(call)', () => {
       handler: 'test',
       body,
     });
+
     expect(result).toEqual(expected);
     done();
   });

@@ -89,7 +89,22 @@ const callService = ({
       throw new Error(`Service ${namespace || defaultNamespace()}.${service}.${handler} not found`);
     }
 
-    const [serviceToRun] = Instances;
+    // Lambda currently searches based on a field in Attributes
+    // called handler, which is the same as InstanceId,
+    // but services which aren't lambdas, use InstanceId.
+    // In future `InstanceId` should refer to the handler name... this is a fallback.
+    let serviceToRun = Instances.find(({ Id }) => Id === handler);
+
+    // If we don't find an instance by instance id, find the first in the list.
+    // Which will likely be a lambda with an incorrect InstanceId. In which case,
+    // it will contain an array with a single item in it.
+    if (!serviceToRun) {
+      [serviceToRun] = Instances;
+    }
+
+    if (!serviceToRun) {
+      throw new Error(`couldn't find a service with instance id or handler name: ${handler}`);
+    }
 
     return runService(serviceToRun, body, opts)
       .then((payload) => {
