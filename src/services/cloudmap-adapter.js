@@ -24,6 +24,7 @@ class CloudmapAdapter {
   async find(namespace, service, instance, params = {}) {
     const res = await this.discover(namespace, service, params);
     const i = res.Instances.find(item => item.InstanceId === instance);
+    if (!i) throw new Error(`no service found: ${namespace}.${service}->${instance}`);
     return {
       id: instance,
       attributes: i.Attributes,
