@@ -64,6 +64,22 @@ messages.on('message', (message) => {
 ```
 
 ### Register a service (Cloudformation)
-```
-// @todo - 
+```yaml
+CloudMapService:
+  Type: AWS::ServiceDiscovery::Service
+  Properties:
+    Description: discover handlers for ais-service-segment-explorer
+    Name: segment-explorer
+    NamespaceId: ${cf:ais-${opt:stage}-service-discovery.NamespaceId}
+
+CreateRefreshSegmentInstance:
+  Type: "AWS::ServiceDiscovery::Instance"
+  Properties:
+    InstanceAttributes:
+      arn: ${self:service}-${opt:stage}-refresh-segment
+      handler: refresh-segment
+      type: function
+    InstanceId: refresh-segment
+    ServiceId:
+      Ref: CloudMapService
 ```
