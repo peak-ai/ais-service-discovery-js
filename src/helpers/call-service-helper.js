@@ -14,13 +14,13 @@ const HANDLER_NOTATION = '->';
 
 const getHandler = (serviceId) => {
   if (serviceId.includes(HANDLER_NOTATION)) {
-    return serviceId.split(HANDLER_NOTATION);
+    return serviceId.split(HANDLER_NOTATION)[1];
   }
   return false;
 };
 
 // This takes a serviceId in the user-facing form and
-// reconsitutes it into parts an in our internal form.
+// reconstitutes it into parts an in our internal form.
 //
 // For example, `namespace.service->handler`, becomes
 // `namespace.service.handler`.
@@ -39,39 +39,25 @@ const extractServiceParts = (serviceId) => {
 
     // Check if the service contains a handler, denoted
     // by a HANDLER_NOTATION.
-    const hasHandler = getHandler(service);
-    if (hasHandler) {
-      const [serviceName, handler] = hasHandler;
-      return {
-        namespace,
-        service: serviceName,
-        handler,
-      };
-    }
+    const instance = getHandler(service);
+
+    const [srv] = service.split(HANDLER_NOTATION);
     return {
       namespace,
-      service,
+      service: srv,
+      instance,
     };
   }
 
-  // If service has a function handler
-  // return service with handler in
-  // base format.
-  const hasHandler = getHandler(serviceId);
-  if (hasHandler) {
-    const [serviceName, handler] = hasHandler;
-    return {
-      namespace: defaultNamespace(),
-      service: serviceName,
-      handler,
-    };
-  }
+  const instance = getHandler(serviceId);
+  const service = serviceId.split(HANDLER_NOTATION)[0];
 
   // Default behavior, returns serviceId
   // given, with the default namespace.
   return {
     namespace: defaultNamespace(),
-    service: serviceId,
+    service,
+    instance,
   };
 };
 

@@ -5,8 +5,12 @@ class Services {
     this.adapter = adapter;
   }
 
-  discover(namespace, name, handler) {
-    return this.adapter.discover(namespace, name, handler);
+  discover(namespace, service, params = {}) {
+    return this.adapter.discover(namespace, service, params);
+  }
+
+  find(namespace, service, instance, params = {}) {
+    return this.adapter.find(namespace, service, instance, params);
   }
 }
 

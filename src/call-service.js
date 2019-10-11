@@ -38,7 +38,7 @@ const ssmAdapter = new SSMAdapter(ssm);
 const automation = new Automation(ssmAdapter);
 
 const runService = (service, body, opts = {}) => {
-  const { type, arn, url } = service.Attributes;
+  const { type, arn, url } = service.attributes;
 
   switch (type) {
     case 'cloud-function':
@@ -80,33 +80,16 @@ const runService = (service, body, opts = {}) => {
 const callService = ({
   namespace,
   service,
-  handler,
+  instance,
   body,
   opts,
-} = {}) => services.discover(namespace || defaultNamespace(), service, handler)
-  .then(({ Instances }) => {
-    if (Instances.length === 0) {
-      throw new Error(`Service ${namespace || defaultNamespace()}.${service}.${handler} not found`);
+} = {}) => services.find(namespace || defaultNamespace(), service, instance)
+  .then((foundInstance) => {
+    if (!foundInstance) {
+      throw new Error(`couldn't find a service with instance id or instance name: ${instance}`);
     }
 
-    // Lambda currently searches based on a field in Attributes
-    // called handler, which is the same as InstanceId,
-    // but services which aren't lambdas, use InstanceId.
-    // In future `InstanceId` should refer to the handler name... this is a fallback.
-    let serviceToRun = Instances.find(({ Id }) => Id === handler);
-
-    // If we don't find an instance by instance id, find the first in the list.
-    // Which will likely be a lambda with an incorrect InstanceId. In which case,
-    // it will contain an array with a single item in it.
-    if (!serviceToRun) {
-      [serviceToRun] = Instances;
-    }
-
-    if (!serviceToRun) {
-      throw new Error(`couldn't find a service with instance id or handler name: ${handler}`);
-    }
-
-    return runService(serviceToRun, body, opts)
+    return runService(foundInstance, body, opts)
       .then((payload) => {
         if (payload && payload.errorMessage && payload.errorType) {
           throw payload;
@@ -116,10 +99,10 @@ const callService = ({
   });
 
 const request = (serviceID, body, opts) => {
-  const { namespace, service, handler } = extractServiceParts(serviceID);
+  const { namespace, service, instance } = extractServiceParts(serviceID);
   return callService({
     namespace,
-    handler,
+    instance,
     service,
     body,
     opts,
@@ -127,20 +110,22 @@ const request = (serviceID, body, opts) => {
 };
 
 const publish = (serviceID, body, opts) => {
-  const { namespace, service } = extractServiceParts(serviceID);
+  const { namespace, service, instance } = extractServiceParts(serviceID);
   return callService({
     namespace,
     service,
+    instance,
     body,
     opts: { subscribe: false, ...opts },
   });
 };
 
 const subscribe = (serviceID, opts = {}) => {
-  const { namespace, service } = extractServiceParts(serviceID);
+  const { namespace, service, instance } = extractServiceParts(serviceID);
   return callService({
     namespace,
     service,
+    instance,
     opts: { subscribe: true, ...opts },
   });
 };
