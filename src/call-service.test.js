@@ -20,59 +20,54 @@ describe('(call)', () => {
   });
 
   const lambdaService = {
-    Instances: [{
-      Attributes: {
-        type: 'lambda',
-        arn: 'my-test-arn',
-      },
-    }],
+    id: 'my-func',
+    attributes: {
+      type: 'function',
+      arn: 'my-test-arn',
+    },
   };
 
   const stateMachineService = {
-    Instances: [{
-      Attributes: {
-        type: 'state-machine',
-        arn: 'my-test-arn',
-      },
-    }],
+    id: 'state-machine',
+    attributes: {
+      type: 'state-machine',
+      arn: 'my-test-arn',
+    },
   };
 
   const automationService = {
-    Instances: [{
-      Attributes: {
-        type: 'automation',
-        arn: 'ExampleDocumentName',
-      },
-    }],
+    id: 'test',
+    attributes: {
+      type: 'automation',
+      arn: 'ExampleDocumentName',
+    },
   };
 
   const snsService = {
-    Instances: [{
-      Attributes: {
-        type: 'sns',
-        arn: 'test-topic',
-      },
-    }],
+    id: 'test-topic',
+    attributes: {
+      type: 'sns',
+      arn: 'test-topic',
+    },
   };
 
   const sqsService = {
-    Instances: [{
-      Attributes: {
-        type: 'queue',
-        url: 'test-queue',
-      },
-    }],
+    id: 'sqs',
+    attributes: {
+      type: 'queue',
+      url: 'test-queue',
+    },
   };
 
   it('should call a lambda function', async () => {
     const expected = { name: 'test' };
-    CloudmapAdapter.prototype.discover = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
+    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
     LambdaAdapter.prototype.call = jest.fn().mockImplementation(() => Promise.resolve(expected));
     expect.assertions(1);
     const body = { name: 'Ewan' };
     const res = await ServiceDiscovery.call({
       service: 'test-service',
-      handler: 'my-func',
+      instance: 'my-func',
       body,
     });
     expect(res).toEqual(expected);
@@ -80,23 +75,25 @@ describe('(call)', () => {
 
   it('should call a lambda using a service id', async () => {
     const expected = { name: 'test' };
-    CloudmapAdapter.prototype.discover = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
+    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
     LambdaAdapter.prototype.call = jest.fn().mockImplementation(() => Promise.resolve(expected));
     expect.assertions(1);
     const body = { name: 'Ewan' };
-    const res = await ServiceDiscovery.request('test-service.my-func', body);
+    const res = await ServiceDiscovery.request('my-namespace.test-service->my-func', body);
     expect(res).toEqual(expected);
   });
 
   it('should publish an sns event', async () => {
     const messageId = 'abc123';
-    CloudmapAdapter.prototype.discover = jest.fn().mockReturnValue(Promise.resolve(snsService));
+    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(snsService));
     SNS.prototype.publish = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: messageId,
     }));
+
     expect.assertions(2);
+
     const event = { name: 'Test' };
-    const res = await ServiceDiscovery.publish('test-namespace.test-topic', event);
+    const res = await ServiceDiscovery.publish('test-namespace.test-service->test-topic', event);
     expect(SNS.prototype.publish).toBeCalledWith('test-topic', event);
     expect(res).toEqual({ MessageId: messageId });
   });
@@ -110,7 +107,7 @@ describe('(call)', () => {
     const mockMessageId = 'abc123';
     const opts = { MessageGroupId: 'abc123', MessageDeduplicationId: 'abc123' };
 
-    CloudmapAdapter.prototype.discover = jest.fn().mockReturnValue(Promise.resolve(sqsService));
+    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(sqsService));
     SQS.prototype.send = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: mockMessageId,
     }));
@@ -121,13 +118,13 @@ describe('(call)', () => {
 
     const mockDelete = jest.fn();
 
-    CloudmapAdapter.prototype.discover = jest.fn().mockReturnValue(Promise.resolve(sqsService));
+    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(sqsService));
     SQS.prototype.listen = jest.fn().mockImplementation(() => Promise.resolve({
       message,
       delete: mockDelete,
     }));
 
-    const messages = await ServiceDiscovery.listen('test-namespace.test-queue');
+    const messages = await ServiceDiscovery.listen('test-namespace.test-service->test-queue');
     messages.on('message', (msg) => {
       msg.delete();
       expect(message).toEqual(msg.message);
@@ -141,12 +138,13 @@ describe('(call)', () => {
   it('should use the specified namespace if included in service name', async () => {
     expect.assertions(1);
 
-    const serviceWithNamespace = 'my-namespace.service-name';
+    const serviceWithNamespace = 'my-namespace.service-name->instance';
 
     expect(extractServiceParts(serviceWithNamespace))
       .toEqual({
         namespace: 'my-namespace',
         service: 'service-name',
+        instance: 'instance',
       });
   });
 
@@ -154,43 +152,46 @@ describe('(call)', () => {
     expect.assertions(1);
 
     const defaultNamespaceVal = 'default';
-    const serviceWithoutNamespace = 'service-name';
+    const serviceWithoutNamespace = 'service-name->instance';
 
     expect(extractServiceParts(serviceWithoutNamespace))
       .toEqual({
         namespace: defaultNamespaceVal,
         service: 'service-name',
+        instance: 'instance',
       });
   });
 
   it('should start a state machine', async (done) => {
     const expected = { name: 'testing' };
-    CloudmapAdapter.prototype.discover = jest.fn()
+    CloudmapAdapter.prototype.find = jest.fn()
       .mockReturnValue(Promise.resolve(stateMachineService));
     StepFunctionAdapter.prototype.start = jest.fn().mockReturnValue(Promise.resolve(expected));
     const body = { name: 'test', tenant: 'mock' };
 
     const result = await ServiceDiscovery.call({
       service: 'test-service',
-      handler: 'test',
+      instance: 'test',
       body,
     });
+
     expect(result).toEqual(expected);
     done();
   });
 
   it('should run an automation task', async (done) => {
     const expected = { name: 'testing' };
-    CloudmapAdapter.prototype.discover = jest.fn()
+    CloudmapAdapter.prototype.find = jest.fn()
       .mockReturnValue(Promise.resolve(automationService));
     SSMAdapter.prototype.run = jest.fn().mockReturnValue(Promise.resolve(expected));
     const body = { name: 'test', tenant: 'mock' };
 
     const result = await ServiceDiscovery.call({
       service: 'test-service',
-      handler: 'test',
+      instance: 'test',
       body,
     });
+
     expect(result).toEqual(expected);
     done();
   });
