@@ -34,7 +34,7 @@ const ServiceDiscovery = require('@peak-ai/ais-service-discovery');
 await ServiceDiscovery.call({
   namespace,
   service,
-  handler,
+  instance,
   body: {
     ...stuff
   },
@@ -47,17 +47,17 @@ await ServiceDiscovery.call('namespace.service->handler',  body);
 ### Publish an SNS event
 
 ```javascript
-await ServiceDiscovery.publish('namspace.topic', event, opts);
+await ServiceDiscovery.publish('namspace.service-name->topic', event, opts);
 ```
 
 ### Add message to queue
 ```javascript
-await ServiceDiscovery.queue('namespace.queue-name', message, opts // optional);
+await ServiceDiscovery.queue('namespace.service-name->queue-name', message, opts // optional);
 ```
 
 ### List to queue
 ```javascript
-const messages = await ServiceDiscovery.listen('namespace.queue-name', opts // optional);
+const messages = await ServiceDiscovery.listen('namespace.service-name->queue-name', opts // optional);
 messages.on('message', (message) => {
 
 });
@@ -77,7 +77,6 @@ CreateRefreshSegmentInstance:
   Properties:
     InstanceAttributes:
       arn: ${self:service}-${opt:stage}-refresh-segment
-      handler: refresh-segment
       type: function
     InstanceId: refresh-segment
     ServiceId:
