@@ -5,23 +5,15 @@
 const { extractServiceParts } = require('./call-service-helper');
 
 const golden = {
-  service: {
-    namespace: 'default',
-    service: 'service',
-  },
-  'namespace.service': {
-    namespace: 'namespace',
-    service: 'service',
-  },
   'namespace.service->handler': {
     namespace: 'namespace',
     service: 'service',
-    handler: 'handler',
+    instance: 'handler',
   },
   'service->handler': {
     namespace: 'default',
     service: 'service',
-    handler: 'handler',
+    instance: 'handler',
   },
 };
 
