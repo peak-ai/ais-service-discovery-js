@@ -31,17 +31,7 @@ const ServiceDiscovery = require('@peak-ai/ais-service-discovery');
 ### Call a function
 
 ```javascript
-await ServiceDiscovery.call({
-  namespace,
-  service,
-  instance,
-  body: {
-    ...stuff
-  },
-});
-
-// Or...
-await ServiceDiscovery.call('namespace.service->handler',  body);
+await ServiceDiscovery.request('namespace.service->handler',  body);
 ```
 
 ### Publish an SNS event
@@ -50,12 +40,12 @@ await ServiceDiscovery.call('namespace.service->handler',  body);
 await ServiceDiscovery.publish('namspace.service-name->topic', event, opts);
 ```
 
-### Add message to queue
+### Add message to queue
 ```javascript
 await ServiceDiscovery.queue('namespace.service-name->queue-name', message, opts // optional);
 ```
 
-### List to queue
+### List to queue
 ```javascript
 const messages = await ServiceDiscovery.listen('namespace.service-name->queue-name', opts // optional);
 messages.on('message', (message) => {
@@ -63,7 +53,7 @@ messages.on('message', (message) => {
 });
 ```
 
-### Register a service (Cloudformation)
+### Register a service (Cloudformation)
 ```yaml
 CloudMapService:
   Type: AWS::ServiceDiscovery::Service
