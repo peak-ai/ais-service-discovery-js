@@ -93,8 +93,16 @@ describe('(call)', () => {
     expect.assertions(2);
 
     const event = { name: 'Test' };
-    const res = await ServiceDiscovery.publish('test-namespace.test-service->test-topic', event);
-    expect(SNS.prototype.publish).toBeCalledWith('test-topic', event);
+
+    const attributes = {
+      tenant: {
+        DataType: 'String',
+        StringValue: 'foo',
+      },
+    };
+
+    const res = await ServiceDiscovery.publish('test-namespace.test-service->test-topic', event, { attributes });
+    expect(SNS.prototype.publish).toBeCalledWith('test-topic', event, attributes);
     expect(res).toEqual({ MessageId: messageId });
   });
 
