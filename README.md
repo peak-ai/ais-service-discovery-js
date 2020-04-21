@@ -39,7 +39,15 @@ await ServiceDiscovery.request('namespace.service->handler',  body);
 ### Publish an SNS event
 
 ```javascript
-await ServiceDiscovery.publish('namspace.service-name->topic', event, opts);
+await ServiceDiscovery.publish('namspace.service-name->topic', event, {
+  ...opts,
+  attributes: { // Matches params.MessageAttributes from aws-sdk
+    tenant: {
+      DataType: 'String',
+      StringValue: 'foo',
+    },
+  },
+});
 ```
 
 ### Add message to queue

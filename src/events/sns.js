@@ -5,10 +5,11 @@ class SNS {
     this.client = client;
   }
 
-  async publish(name, event) {
+  async publish(name, event, attributes) {
     const { MessageId } = await this.client.publish({
       TopicArn: name,
       Message: JSON.stringify(event),
+      MessageAttributes: attributes,
     }).promise();
     return MessageId;
   }

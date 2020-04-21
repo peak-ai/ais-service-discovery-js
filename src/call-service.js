@@ -68,7 +68,7 @@ const runService = (service, body, opts = {}) => {
     case 'event':
     case 'pubsub':
     case 'sns': {
-      return publisher.publish(arn, body, omit(['subscribe', opts]));
+      return publisher.publish(arn, body, omit(['subscribe'], opts));
     }
 
     default: {

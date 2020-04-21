@@ -8,8 +8,8 @@ class Publisher extends EventEmitter {
     this.eventHandler = eventHandler;
   }
 
-  publish(name, message) {
-    return this.eventHandler.publish(name, message);
+  publish(name, message, { attributes }) {
+    return this.eventHandler.publish(name, message, attributes);
   }
 }
 
