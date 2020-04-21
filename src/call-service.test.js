@@ -20,7 +20,7 @@ describe('(call)', () => {
   });
 
   const lambdaService = {
-   id: 'my-func',
+    id: 'my-func',
     attributes: {
       type: 'function',
       arn: 'my-test-arn',
@@ -94,6 +94,22 @@ describe('(call)', () => {
 
     const event = { name: 'Test' };
 
+    const res = await ServiceDiscovery.publish('test-namespace.test-service->test-topic', event);
+    expect(SNS.prototype.publish).toBeCalledWith('test-topic', event, undefined);
+    expect(res).toEqual({ MessageId: messageId });
+  });
+
+  it('should publish an sns event with MessageAttributes if present in the options', async () => {
+    const messageId = 'abc123';
+    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(snsService));
+    SNS.prototype.publish = jest.fn().mockImplementation(() => Promise.resolve({
+      MessageId: messageId,
+    }));
+
+    expect.assertions(2);
+
+    const event = { name: 'Test' };
+
     const attributes = {
       tenant: {
         DataType: 'String',
@@ -101,7 +117,12 @@ describe('(call)', () => {
       },
     };
 
-    const res = await ServiceDiscovery.publish('test-namespace.test-service->test-topic', event, { attributes });
+    const options = {
+      foo: true,
+      attributes,
+    };
+
+    const res = await ServiceDiscovery.publish('test-namespace.test-service->test-topic', event, options);
     expect(SNS.prototype.publish).toBeCalledWith('test-topic', event, attributes);
     expect(res).toEqual({ MessageId: messageId });
   });
