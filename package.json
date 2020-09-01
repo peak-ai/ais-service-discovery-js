@@ -1,20 +1,26 @@
 {
   "name": "@peak-ai/ais-service-discovery",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "src/index.js",
   "repository": "git@github.com:peak-ai/ais-service-discovery-js.git",
   "author": "<ewan.valentine@peak.ai>",
   "license": "MIT",
   "scripts": {
     "test": " jest ./src/**",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "start": "npm run build:live",
+    "build": "tsc -p",
+    "build:live": "nodemon --watch 'src/**/*.ts' --exec \"ts-node\" src/index.ts"
   },
   "devDependencies": {
+    "@types/node": "^14.6.2",
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^22.3.2",
-    "jest": "^24.5.0"
+    "jest": "^24.5.0",
+    "nodemon": "^2.0.4",
+    "typescript": "^4.0.2"
   },
   "dependencies": {
     "aws-sdk": "^2.420.0",
