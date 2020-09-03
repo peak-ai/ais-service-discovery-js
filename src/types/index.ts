@@ -1,28 +1,28 @@
 export interface IQueueAdapter {
-  queue(service: ServiceResponse, request: Request, opts?: Opts): Response,
-  listen(service: ServiceResponse, request: Request, opts?: Opts): Response,
+  queue(service: ServiceResponse, request: Request, opts?: Opts): Promise<QueueResponse>,
+  listen(service: ServiceResponse, request: Request, opts?: Opts): Promise<IMessage | null>,
 }
 
 export interface IPubSubAdapter {
-  publish(service: ServiceResponse, request: Request, opts?: Opts): Response,
-  subscribe(service: ServiceResponse, request: Request, opts?: Opts): Response,
+  publish(service: ServiceResponse, request: Request, opts?: Opts): Promise<PubSubResponse>,
+  subscribe(service: ServiceResponse, request: Request, opts?: Opts): Promise<PubSubResponse>,
 }
 
 export interface IFunctionAdapter {
-  request(service: ServiceResponse, request: Request, opts?: Opts): Response,
+  request(service: ServiceResponse, request: Request, opts?: Opts): Promise<Response>,
 }
 
-export type Attribute = {};
-
-export type Attributes = Attribute[];
+export type Attributes = {
+  [key: string]: string | number | boolean;
+}
 
 export type ServiceResponse = {
-  id: string;
-  attributes: Attributes;
+  rid: string;
+  attributes?: Attributes;
 };
 
 export interface IDiscoverAdapter {
-  locate(service: ServiceRequest): ServiceResponse,
+  locate(serviceRequest: ServiceRequest, opts?: Opts): Promise<ServiceResponse>,
 }
 
 export type Backend = {
@@ -41,7 +41,9 @@ export type Response = {
   body: string;
 };
 
-export type Opts = {};
+export type Opts = {
+  [key: string]: boolean | string | number;
+};
 
 export type ServiceRequest = {
   instance:  string;
@@ -50,5 +52,23 @@ export type ServiceRequest = {
 };
 
 export interface IAddressParser {
-  parse(addr: string): ServiceRequest;
+  parse(addr: string): ServiceRequest,
+}
+
+export interface IMessage {
+  message: string,
+  messageId: string,
+  delete(receipt: string, name: string): Promise<void>,
+}
+
+export type QueueResponse = {
+  id: string;
+  body?: string;
+};
+
+export type PubSubResponse = {
+  // Some cases we subscribe to something, which turns a resource id,
+  // For example an SNS subscription returns an ARN.
+  rid?: string;
+  messageId?: string;
 };

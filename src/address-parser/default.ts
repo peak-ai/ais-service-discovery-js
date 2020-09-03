@@ -1,13 +1,18 @@
 import {
+  IAddressParser,
   ServiceRequest
 } from "../types";
 
-export const defaultAddressParser = (addr: string): ServiceRequest => {
-  return {
-    instance,
-    service,
-    namespace,
-  };
-};
+class DefaultAddressParser implements IAddressParser {
+  parse(addr: string): ServiceRequest {
+    const [namespace, service] = addr.split('.');
+    const [_, instance] = service.split('->');
+    return {
+      instance,
+      service,
+      namespace,
+    };
+  }
+}
 
-export default defaultAddressParser;
+export default DefaultAddressParser;

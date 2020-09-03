@@ -1,42 +1,72 @@
-'use strict';
+import AWS from 'aws-sdk';
+import {
+  Opts,
+  Request,
+  IMessage,
+  QueueResponse,
+  IQueueAdapter,
+  ServiceResponse,
+} from "../../types";
 
 const DEFAULT_INTERVAL = 10;
-class SQS {
-  private client = '';
-  private opts = {};
 
-  constructor(client, opts = {}) {
+type SQSOpts = {
+  interval: number;
+};
+
+class SQS implements IQueueAdapter {
+  private readonly client: AWS.SQS;
+  private opts?: SQSOpts;
+
+  constructor(client: AWS.SQS, opts?: SQSOpts) {
     this.client = client;
     this.opts = opts;
   }
 
-  send(name, event, opts = {}) {
-    return this.client.sendMessage({
+  public async queue(service: ServiceResponse, request: Request, opts?: Opts): Promise<QueueResponse> {
+    const res = await this.client.sendMessage({
       QueueUrl: name,
-      MessageBody: JSON.stringify(event),
+      MessageBody: JSON.stringify(request),
       ...opts,
     }).promise();
-  }
 
-  async listen(name) {
-    const { Messages } = await this.client.receiveMessage({
-      QueueUrl: name,
-      WaitTimeSeconds: this.opts.interval || DEFAULT_INTERVAL,
-    }).promise();
-    if (!Messages) return null;
-    const [message] = Messages;
+    const id = res.MessageId;
+
+    if (!id) {
+      throw new Error('no message id in response from sqs');
+    }
+
     return {
-      message: message.Body,
-      messageId: message.MessageId,
-      delete: this.delete(message.ReceiptHandle, name),
+      id,
     };
   }
 
-  delete(receipt, url) {
-    return () => this.client.deleteMessage({
-      QueueUrl: url,
-      ReceiptHandle: receipt,
+  public async listen(service: ServiceResponse, request: Request, opts?: Opts): Promise<IMessage | null> {
+    const { Messages } = await this.client.receiveMessage({
+      QueueUrl: service.rid,
+      WaitTimeSeconds: this.opts?.interval || DEFAULT_INTERVAL,
     }).promise();
+    if (!Messages) return null;
+    const [message] = Messages;
+
+    if (!message.Body || message.MessageId || !message.ReceiptHandle) {
+      return null;
+    }
+
+    return {
+      message: message.Body,
+      messageId: message.MessageId as string,
+      delete: this.delete(message.ReceiptHandle, service.rid),
+    };
+  }
+
+  public delete(receipt: string, url: string): () => Promise<void> {
+    return async () => {
+      await this.client.deleteMessage({
+        QueueUrl: url,
+        ReceiptHandle: receipt,
+      }).promise();
+    }
   }
 }
 

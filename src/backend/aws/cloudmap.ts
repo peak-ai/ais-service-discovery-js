@@ -1,35 +1,59 @@
-import { ServiceResponse } from "../../types";
-import aws from "aws-sdk";
+import {
+  Opts,
+  ServiceResponse,
+  IDiscoverAdapter,
+  ServiceRequest, Attributes,
+} from "../../types";
 
-class CloudmapAdapter {
-  private client = '';
+import AWS from "aws-sdk";
 
-  constructor(client) {
+class CloudmapAdapter implements IDiscoverAdapter {
+  private readonly client: AWS.ServiceDiscovery;
+
+  constructor(client: AWS.ServiceDiscovery) {
     this.client = client;
+  }
+
+  private toParams(opts?: Opts): AWS.ServiceDiscovery.Attributes {
+    if (!opts) {
+      return {};
+    }
+
+    const o = Object.entries(opts);
+    return o.reduce((a, b) => {
+      const [key, value] = b;
+      return {
+        ...a,
+        [key]: value as string,
+      }
+    }, {});
   }
 
   /*
    * Discover will find multiple instances by a specified
    * object containing metadata registered against an instance.
    */
-  discover(namespace, service, queryParams = {}) {
+  private discover(namespace:string, service: string, opts?: Opts): Promise<AWS.ServiceDiscovery.DiscoverInstancesResponse> {
     const params = {
       NamespaceName: namespace,
       ServiceName: service,
-      QueryParameters: queryParams,
+      QueryParameters: this.toParams(opts),
     };
-    return this.client.discoverInstances(params).promise();
+    return this.client.discoverInstances(params, () => {}).promise();
   }
 
-  /**
-   * Finds a single instance by id.
-   */
-  async find(namespace: string, service: string, instance: string, params = {}): ServiceResponse {
-    const res = await this.discover(namespace, service, params);
+  public async locate(serviceRequest: ServiceRequest, opts?: Opts): Promise<ServiceResponse> {
+    const { namespace, service, instance } = serviceRequest;
+    const res = await this.discover(namespace, service, opts);
+    if (!res?.Instances) throw new Error(`no service found: ${namespace}.${service}->${instance}`);
+
     const i = res.Instances.find(item => item.InstanceId === instance);
-    if (!i) throw new Error(`no service found: ${namespace}.${service}->${instance}`);
+    if (!i) {
+      throw new Error('no valid instance found with given instance id');
+    }
+
     return {
-      id: instance,
+      rid: instance,
       attributes: i.Attributes,
     };
   }
