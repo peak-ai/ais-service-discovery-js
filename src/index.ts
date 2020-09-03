@@ -8,9 +8,12 @@ import {
   listen,
 } from "./call-service";
 
-import ServiceDiscovery from "./service-discovery";
+// Beta api -
+import ServiceDiscovery from "./backend/backend";
+import { WithMockBackend } from "./backend/mock/mock";
+import { WithAwsBackend } from "./backend/aws/aws";
 
-export default {
+export {
   call,
   request,
   publish,
@@ -18,5 +21,8 @@ export default {
   queue,
   listen,
 
+  // Beta api
   ServiceDiscovery,
+  WithMockBackend,
+  WithAwsBackend,
 };

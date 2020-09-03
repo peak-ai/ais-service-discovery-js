@@ -82,3 +82,40 @@ CreateRefreshSegmentInstance:
     ServiceId:
       Ref: CloudMapService
 ```
+
+
+## Upcoming Beta version
+
+We're releasing an update which allows you to configure and write modular 'backends' for the core service discovery library.
+
+In this new version we're also introducing Typescript.
+
+For example (previous):
+```typescript
+const ServiceDiscovery = require('@peak-ai/ais-service-discovery-js');
+ServiceDiscovery.request('latest.service->instance', request);
+```
+
+The above example only deals with AWS, and there's no way to reconfigure this behaviour. 
+
+This is fairly limiting, especially for testing locally. We came up with the idea of being able to 'mock' or 'stub' these requests locally, for a faster development process.
+
+New example:
+```typescript
+import { WithMockedBackend, WithAWSBackend } from "@peak-ai/ais-service-discovery-js";
+
+// Config to decide what to do locally
+const config = {
+  "latest.service->instance": {
+    resolver: { mockedResponse: { message: 'Hello World' } },
+  },
+};
+
+// Responds with mocked responses
+const local = WithMockedBackend(config);
+const res = await local.request('latest.service->instance', request);
+
+// Communicates via SQS
+const prod = WithAWSBackend();
+await prod.queue('latest.service->instance', request);
+```
