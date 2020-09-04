@@ -5,8 +5,8 @@ import {
 
 class DefaultAddressParser implements IAddressParser {
   parse(addr: string): ServiceRequest {
-    const [namespace, service] = addr.split('.');
-    const [_, instance] = service.split('->');
+    const [namespace, rest] = addr.split('.');
+    const [service, instance] = rest.split('->');
     return {
       instance,
       service,

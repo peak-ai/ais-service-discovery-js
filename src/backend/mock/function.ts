@@ -1,4 +1,3 @@
-import AWS from 'aws-sdk';
 import {IFunctionAdapter, Opts, ServiceResponse, Request, Response} from "../../types";
 import {Config} from "./types";
 
@@ -15,8 +14,9 @@ class FunctionAdapter implements IFunctionAdapter {
     if (!payload) {
       throw new Error('you must configure a mockedResponse property on your resolver for this addr');
     }
+
     return {
-      body: JSON.stringify(payload),
+      body: payload,
     };
   }
 }

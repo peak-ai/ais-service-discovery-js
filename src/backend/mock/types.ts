@@ -1,6 +1,6 @@
 export type Resolver = {
-  type: string;
-  endpoint: string;
+  type?: string;
+  endpoint?: string;
   mockedResponse?: string;
 };
 

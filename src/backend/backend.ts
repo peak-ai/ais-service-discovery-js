@@ -1,5 +1,3 @@
-import AWS from "aws-sdk";
-
 import {
   Request,
   Response,

@@ -9,7 +9,9 @@ class Queue implements IQueueAdapter {
   }
 
   public async queue(service: ServiceResponse, request: Request, opts?: Opts): Promise<QueueResponse> {
-    return { id: '' };
+    const s = service.rid;
+    const config = this.config[s];
+    return { id: config.resolve.mockedResponse as string };
   }
 
   public async listen(service: ServiceResponse, request: Request, opts?: Opts): Promise<IMessage | null> {
