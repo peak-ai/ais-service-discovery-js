@@ -6,12 +6,12 @@ import {
   subscribe,
   queue,
   listen,
-} from "./call-service";
+} from './call-service';
 
 // Beta api -
-import ServiceDiscovery from "./backend/backend";
-import { WithMockBackend } from "./backend/mock/mock";
-import { WithAwsBackend } from "./backend/aws/aws";
+import ServiceDiscovery from './backend/backend';
+import { WithMockBackend } from './backend/mock/mock';
+import { WithAwsBackend } from './backend/aws/aws';
 
 export {
   call,
@@ -20,7 +20,6 @@ export {
   subscribe,
   queue,
   listen,
-
   // Beta api
   ServiceDiscovery,
   WithMockBackend,

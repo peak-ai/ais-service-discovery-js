@@ -1,26 +1,42 @@
 {
   "name": "@peak-ai/ais-service-discovery",
-  "version": "0.2.1",
-  "main": "lib/index.js",
+  "version": "0.3.0-rc1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "git@github.com:peak-ai/ais-service-discovery-js.git",
   "author": "<engineering@peak.ai>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn format && yarn preupdate"
+    }
+  },
   "scripts": {
-    "test": " jest ./src/**",
-    "lint": "eslint ./src",
-    "start": "npm run build:live",
+    "lint": "eslint jest.config*js 'src/**/*.ts'",
+    "format": "prettier --write jest.config*js 'src/**/*.ts'",
+    "format:check": "prettier --check jest.config*js 'src/**/*.ts'",
     "build": "tsc -p .",
-    "build:live": "nodemon --watch 'src/**/*.ts' --exec \"ts-node\" src/index.ts"
+    "preupdate": "yarn lint && yarn build && yarn test:dist",
+    "prepublishOnly": "yarn format:check && yarn preupdate",
+    "test": "jest",
+    "test:dist": "jest --config jest.config.dist.js"
   },
   "devDependencies": {
     "@types/jest": "^26.0.13",
     "@types/node": "^14.6.2",
-    "eslint": "^5.15.1",
+    "@typescript-eslint/eslint-plugin": "2.21.0",
+    "@typescript-eslint/parser": "2.21.0",
+    "eslint": "^7.8.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^22.3.2",
+    "husky": "^4.2.5",
     "jest": "^26.4.2",
     "nodemon": "^2.0.4",
+    "prettier": "^2.1.1",
     "ts-jest": "^26.3.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2"

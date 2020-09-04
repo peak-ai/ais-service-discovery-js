@@ -2,10 +2,11 @@ import {
   Opts,
   ServiceResponse,
   IDiscoverAdapter,
-  ServiceRequest, Attributes,
-} from "../../types";
+  ServiceRequest,
+  Attributes,
+} from '../../types';
 
-import AWS from "aws-sdk";
+import AWS from 'aws-sdk';
 
 class CloudmapAdapter implements IDiscoverAdapter {
   private readonly client: AWS.ServiceDiscovery;
@@ -25,7 +26,7 @@ class CloudmapAdapter implements IDiscoverAdapter {
       return {
         ...a,
         [key]: value as string,
-      }
+      };
     }, {});
   }
 
@@ -33,7 +34,11 @@ class CloudmapAdapter implements IDiscoverAdapter {
    * Discover will find multiple instances by a specified
    * object containing metadata registered against an instance.
    */
-  private discover(namespace:string, service: string, opts?: Opts): Promise<AWS.ServiceDiscovery.DiscoverInstancesResponse> {
+  private discover(
+    namespace: string,
+    service: string,
+    opts?: Opts,
+  ): Promise<AWS.ServiceDiscovery.DiscoverInstancesResponse> {
     const params = {
       NamespaceName: namespace,
       ServiceName: service,
@@ -42,18 +47,44 @@ class CloudmapAdapter implements IDiscoverAdapter {
     return this.client.discoverInstances(params, () => {}).promise();
   }
 
-  public async locate(serviceRequest: ServiceRequest, opts?: Opts): Promise<ServiceResponse> {
+  public async locate(
+    serviceRequest: ServiceRequest,
+    opts?: Opts,
+  ): Promise<ServiceResponse> {
     const { namespace, service, instance } = serviceRequest;
     const res = await this.discover(namespace, service, opts);
-    if (!res?.Instances) throw new Error(`no service found: ${namespace}.${service}->${instance}`);
+    if (!res?.Instances)
+      throw new Error(`no service found: ${namespace}.${service}->${instance}`);
 
-    const i = res.Instances.find(item => item.InstanceId === instance);
+    const i = res.Instances.find((item) => item.InstanceId === instance);
     if (!i) {
       throw new Error('no valid instance found with given instance id');
     }
 
+    const attributes = i.Attributes;
+    if (!attributes) {
+      throw new Error(
+        'no attributed found, we need these to find a usable resource id',
+      );
+    }
+
+    // Create an array of all of the possible set ID's. We have to do this because initially we used
+    // 'arn', then queues used 'url', then we decided we should try to use something agnostic, so
+    // introduced 'rid' (resource id). But, in the interest of backwards compatibility, we should check them all.
+    const identifiers = [
+      attributes['id'],
+      attributes['arn'],
+      attributes['url'],
+      attributes['rid'],
+    ];
+
+    // Find the id that's used, in theory this will just find the first from the above,
+    // that isn't 'undefined', this could cause issues if people use multiple, or happen to use
+    // one of those attribute values for something else.
+    const rid = identifiers.find((a) => a !== undefined);
+
     return {
-      rid: instance,
+      rid: rid as string,
       attributes: i.Attributes,
     };
   }

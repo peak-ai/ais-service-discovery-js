@@ -6,7 +6,7 @@ import {
   QueueResponse,
   IQueueAdapter,
   ServiceResponse,
-} from "../../types";
+} from '../../types';
 
 const DEFAULT_INTERVAL = 10;
 
@@ -23,12 +23,18 @@ class SQS implements IQueueAdapter {
     this.opts = opts;
   }
 
-  public async queue(service: ServiceResponse, request: Request, opts?: Opts): Promise<QueueResponse> {
-    const res = await this.client.sendMessage({
-      QueueUrl: name,
-      MessageBody: JSON.stringify(request),
-      ...opts,
-    }).promise();
+  public async queue(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<QueueResponse> {
+    const res = await this.client
+      .sendMessage({
+        QueueUrl: service.rid,
+        MessageBody: JSON.stringify(request),
+        ...opts,
+      })
+      .promise();
 
     const id = res.MessageId;
 
@@ -41,11 +47,17 @@ class SQS implements IQueueAdapter {
     };
   }
 
-  public async listen(service: ServiceResponse, request: Request, opts?: Opts): Promise<IMessage | null> {
-    const { Messages } = await this.client.receiveMessage({
-      QueueUrl: service.rid,
-      WaitTimeSeconds: this.opts?.interval || DEFAULT_INTERVAL,
-    }).promise();
+  public async listen(
+    service: ServiceResponse,
+    opts?: Opts,
+  ): Promise<IMessage | null> {
+    const { Messages } = await this.client
+      .receiveMessage({
+        QueueUrl: service.rid,
+        WaitTimeSeconds:
+          (opts?.interval as number) || this.opts?.interval || DEFAULT_INTERVAL,
+      })
+      .promise();
     if (!Messages) return null;
     const [message] = Messages;
 
@@ -62,11 +74,13 @@ class SQS implements IQueueAdapter {
 
   public delete(receipt: string, url: string): () => Promise<void> {
     return async () => {
-      await this.client.deleteMessage({
-        QueueUrl: url,
-        ReceiptHandle: receipt,
-      }).promise();
-    }
+      await this.client
+        .deleteMessage({
+          QueueUrl: url,
+          ReceiptHandle: receipt,
+        })
+        .promise();
+    };
   }
 }
 

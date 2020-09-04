@@ -1,7 +1,4 @@
-import {
-  IAddressParser,
-  ServiceRequest
-} from "../types";
+import { IAddressParser, ServiceRequest } from '../types';
 
 class DefaultAddressParser implements IAddressParser {
   parse(addr: string): ServiceRequest {

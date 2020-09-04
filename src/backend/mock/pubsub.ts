@@ -4,9 +4,9 @@ import {
   ServiceResponse,
   Opts,
   PubSubResponse,
-} from "../../types";
+} from '../../types';
 
-import { Config } from "./types";
+import { Config } from './types';
 
 class PubSub implements IPubSubAdapter {
   private readonly config: Config;
@@ -15,7 +15,11 @@ class PubSub implements IPubSubAdapter {
     this.config = config;
   }
 
-  async publish(service: ServiceResponse, request: Request, opts?: Opts): Promise<PubSubResponse> {
+  async publish(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<PubSubResponse> {
     const s = service.rid;
     const config = this.config[s];
     return {
@@ -23,7 +27,11 @@ class PubSub implements IPubSubAdapter {
     };
   }
 
-  async subscribe(service: ServiceResponse, request: Request, opts?: Opts): Promise<PubSubResponse> {
+  async subscribe(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<PubSubResponse> {
     const s = service.rid;
     const config = this.config[s];
     return {

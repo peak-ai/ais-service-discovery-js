@@ -2,3 +2,4 @@ node_modules
 _test.js
 .idea
 lib
+dist

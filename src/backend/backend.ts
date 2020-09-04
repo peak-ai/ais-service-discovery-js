@@ -9,8 +9,9 @@ import {
   Opts,
   IPubSubAdapter,
   QueueResponse,
-  IMessage, PubSubResponse,
-} from "../types";
+  IMessage,
+  PubSubResponse,
+} from '../types';
 
 class Backend {
   private addressParser: IAddressParser;
@@ -38,29 +39,49 @@ class Backend {
     return this.discoverAdapter.locate(service);
   }
 
-  async queue(addr: string, request: Request, opts?: Opts): Promise<QueueResponse> {
+  async queue(
+    addr: string,
+    request: Request,
+    opts?: Opts,
+  ): Promise<QueueResponse> {
     const s = await this.locate(addr);
     return this.queueAdapter.queue(s, request, opts);
   }
 
-  async listen(addr: string, request: Request, opts?: Opts): Promise<IMessage | null> {
+  async listen(
+    addr: string,
+    request: Request,
+    opts?: Opts,
+  ): Promise<IMessage | null> {
     const s = await this.locate(addr);
-    return this.queueAdapter.listen(s, request, opts);
+    return this.queueAdapter.listen(s, opts);
   }
 
-  async request(addr: string, request: Request, opts?: Opts): Promise<Response> {
+  async request(
+    addr: string,
+    request: Request,
+    opts?: Opts,
+  ): Promise<Response> {
     const s = await this.locate(addr);
     return this.functionAdapter.request(s, request, opts);
   }
 
-  async publish(addr: string, request: Request, opts?: Opts): Promise<PubSubResponse> {
+  async publish(
+    addr: string,
+    request: Request,
+    opts?: Opts,
+  ): Promise<PubSubResponse> {
     const s = await this.locate(addr);
     return this.pubsubAdapter.publish(s, request, opts);
   }
 
-  async subscribe(addr: string, request: Request, opts?: Opts): Promise<PubSubResponse> {
+  async subscribe(
+    addr: string,
+    request: Request,
+    opts?: Opts,
+  ): Promise<PubSubResponse> {
     const s = await this.locate(addr);
-    return this.pubsubAdapter.subscribe(s, request, opts);
+    return this.pubsubAdapter.subscribe(s, opts);
   }
 }
 

@@ -1,20 +1,32 @@
 export interface IQueueAdapter {
-  queue(service: ServiceResponse, request: Request, opts?: Opts): Promise<QueueResponse>,
-  listen(service: ServiceResponse, request: Request, opts?: Opts): Promise<IMessage | null>,
+  queue(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<QueueResponse>;
+  listen(service: ServiceResponse, opts?: Opts): Promise<IMessage | null>;
 }
 
 export interface IPubSubAdapter {
-  publish(service: ServiceResponse, request: Request, opts?: Opts): Promise<PubSubResponse>,
-  subscribe(service: ServiceResponse, request: Request, opts?: Opts): Promise<PubSubResponse>,
+  publish(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<PubSubResponse>;
+  subscribe(service: ServiceResponse, opts?: Opts): Promise<PubSubResponse>;
 }
 
 export interface IFunctionAdapter {
-  request(service: ServiceResponse, request: Request, opts?: Opts): Promise<Response>,
+  request(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<Response>;
 }
 
 export type Attributes = {
   [key: string]: string | number | boolean;
-}
+};
 
 export type ServiceResponse = {
   rid: string;
@@ -22,14 +34,14 @@ export type ServiceResponse = {
 };
 
 export interface IDiscoverAdapter {
-  locate(serviceRequest: ServiceRequest, opts?: Opts): Promise<ServiceResponse>,
+  locate(serviceRequest: ServiceRequest, opts?: Opts): Promise<ServiceResponse>;
 }
 
 export type Backend = {
-  queueAdapter: IQueueAdapter,
-  pubsubAdapter: IPubSubAdapter,
-  functionAdapter: IFunctionAdapter,
-  discoverAdapter: IDiscoverAdapter,
+  queueAdapter: IQueueAdapter;
+  pubsubAdapter: IPubSubAdapter;
+  functionAdapter: IFunctionAdapter;
+  discoverAdapter: IDiscoverAdapter;
   // automationAdapter: IAutomationAdapter, @todo - not implemented, low priority
 };
 
@@ -46,19 +58,19 @@ export type Opts = {
 };
 
 export type ServiceRequest = {
-  instance:  string;
+  instance: string;
   service: string;
   namespace: string;
 };
 
 export interface IAddressParser {
-  parse(addr: string): ServiceRequest,
+  parse(addr: string): ServiceRequest;
 }
 
 export interface IMessage {
-  message: string,
-  messageId: string,
-  delete(receipt: string, name: string): Promise<void>,
+  message: string;
+  messageId: string;
+  delete(receipt: string, name: string): Promise<void>;
 }
 
 export type QueueResponse = {

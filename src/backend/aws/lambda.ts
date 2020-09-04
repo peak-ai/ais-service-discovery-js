@@ -1,5 +1,11 @@
 import AWS from 'aws-sdk';
-import {IFunctionAdapter, Opts, ServiceResponse, Request, Response} from "../../types";
+import {
+  IFunctionAdapter,
+  Opts,
+  ServiceResponse,
+  Request,
+  Response,
+} from '../../types';
 
 class LambdaAdapter implements IFunctionAdapter {
   private client: AWS.Lambda;
@@ -8,7 +14,11 @@ class LambdaAdapter implements IFunctionAdapter {
     this.client = client;
   }
 
-  async request(service: ServiceResponse, request: Request, opts?: Opts): Promise<Response> {
+  async request(
+    service: ServiceResponse,
+    request: Request,
+    opts?: Opts,
+  ): Promise<Response> {
     const params = {
       ...opts,
       FunctionName: service.rid,
