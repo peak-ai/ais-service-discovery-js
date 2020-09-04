@@ -38,7 +38,7 @@ class Queue implements IQueueAdapter {
     };
   }
 
-  public delete(id: string, rid: string): () => Promise<void> {
+  public delete(_id: string, _rid: string): () => Promise<void> {
     return async () => {
       // No-op
     };
