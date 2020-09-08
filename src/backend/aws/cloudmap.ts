@@ -3,7 +3,6 @@ import {
   ServiceResponse,
   IDiscoverAdapter,
   ServiceRequest,
-  Attributes,
 } from '../../types';
 
 import AWS from 'aws-sdk';

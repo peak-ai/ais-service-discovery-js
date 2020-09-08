@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 import Backend from '../backend';
 
 import SNSAdapter from './sns';

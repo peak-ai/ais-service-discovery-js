@@ -1,10 +1,10 @@
 import AWS from 'aws-sdk';
 import {
-  IFunctionAdapter,
   Opts,
-  ServiceResponse,
   Request,
   Response,
+  ServiceResponse,
+  IFunctionAdapter,
 } from '../../types';
 
 class LambdaAdapter implements IFunctionAdapter {
@@ -14,7 +14,7 @@ class LambdaAdapter implements IFunctionAdapter {
     this.client = client;
   }
 
-  async request(
+  public async request(
     service: ServiceResponse,
     request: Request,
     opts?: Opts,
@@ -24,8 +24,12 @@ class LambdaAdapter implements IFunctionAdapter {
       FunctionName: service.rid,
       Payload: JSON.stringify(request.body),
     };
-    const { Payload, StatusCode } = await this.client.invoke(params).promise();
-    return Payload ? JSON.parse(Payload.toString()) : StatusCode;
+
+    return {
+      body: 'test',
+    };
+    // const { Payload: payload, StatusCode: statusCode } = await this.client.invoke(params).promise();
+    // return payload ? JSON.parse(payload.toString()) : statusCode;
   }
 }
 

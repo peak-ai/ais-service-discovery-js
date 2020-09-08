@@ -34,8 +34,8 @@ class Backend {
     this.pubsubAdapter = pubsubAdapter;
   }
 
-  async locate(addr: string): Promise<ServiceResponse> {
-    const service = await this.addressParser.parse(addr);
+  public locate(addr: string): Promise<ServiceResponse> {
+    const service = this.addressParser.parse(addr);
     return this.discoverAdapter.locate(service);
   }
 
@@ -57,13 +57,16 @@ class Backend {
     return this.queueAdapter.listen(s, opts);
   }
 
-  async request(
+  public request(
     addr: string,
     request: Request,
     opts?: Opts,
   ): Promise<Response> {
-    const s = await this.locate(addr);
-    return this.functionAdapter.request(s, request, opts);
+    return this.locate(addr)
+      .then(s => {
+        console.log(s);
+        return this.functionAdapter.request(s, request, opts);
+      });
   }
 
   async publish(
