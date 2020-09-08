@@ -219,7 +219,20 @@
     "@aws-cdk/core" "1.62.0"
     constructs "^3.0.4"
 
-"@aws-cdk/aws-sqs@1.62.0":
+"@aws-cdk/aws-sns@^1.62.0":
+  version "1.62.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-sns/-/aws-sns-1.62.0.tgz#0c1df930de18b8553042f79d9da80db7eb3eb807"
+  integrity sha512-NCGRq0n9vWmJN4T9IGKFJEFgH3+wDymjhnJp4joZp9OqCVrCT14ZTMBrgV3JghLMFdCz35Zx1m1VUAXtCD3Jsw==
+  dependencies:
+    "@aws-cdk/aws-cloudwatch" "1.62.0"
+    "@aws-cdk/aws-events" "1.62.0"
+    "@aws-cdk/aws-iam" "1.62.0"
+    "@aws-cdk/aws-kms" "1.62.0"
+    "@aws-cdk/aws-sqs" "1.62.0"
+    "@aws-cdk/core" "1.62.0"
+    constructs "^3.0.4"
+
+"@aws-cdk/aws-sqs@1.62.0", "@aws-cdk/aws-sqs@^1.62.0":
   version "1.62.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-sqs/-/aws-sqs-1.62.0.tgz#4453ef20bc3da465eaed7431193bf71664575db2"
   integrity sha512-AJgiLUFtCJLBGRQvAfdAWwEiMhDr7pN7TOGqYnp+Eq2ZCvVH3Ot2hLPTBFv885E8UhieA8OEnEjiz3kwuSC7DQ==

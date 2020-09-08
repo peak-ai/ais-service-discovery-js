@@ -1,5 +1,5 @@
 export interface IQueueAdapter {
-  queue(
+  send(
     service: ServiceResponse,
     request: Request,
     opts?: Opts,
@@ -67,9 +67,15 @@ export interface IAddressParser {
   parse(addr: string): ServiceRequest;
 }
 
-export interface IMessage {
+// Message response, for example returns a message ID
+// from an SQS queue
+export type MessageResponse = {
+  id: string;
+};
+
+// Extends a message response with a delete method
+export interface IMessage extends MessageResponse {
   message: string;
-  messageId: string;
   delete(receipt: string, name: string): Promise<void>;
 }
 
@@ -84,3 +90,8 @@ export type PubSubResponse = {
   rid?: string;
   messageId?: string;
 };
+
+export interface IEventHandler<T, S> {
+  listen(name: ServiceResponse): Promise<IEventHandler<T, S>>;
+  send(name: ServiceResponse, message: T, opts?: Opts): Promise<S>;
+}

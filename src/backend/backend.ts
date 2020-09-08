@@ -9,21 +9,22 @@ import {
   Opts,
   IPubSubAdapter,
   QueueResponse,
-  IMessage,
   PubSubResponse,
 } from '../types';
+
+import Poller from '../poller/poller';
 
 class Backend {
   private addressParser: IAddressParser;
   private discoverAdapter: IDiscoverAdapter;
-  private queueAdapter: IQueueAdapter;
+  private queueAdapter: Poller<IQueueAdapter>;
   private functionAdapter: IFunctionAdapter;
   private pubsubAdapter: IPubSubAdapter;
 
   constructor(
     addressParser: IAddressParser,
     discoverAdapter: IDiscoverAdapter,
-    queueAdapter: IQueueAdapter,
+    queueAdapter: Poller<IQueueAdapter>,
     functionAdapter: IFunctionAdapter,
     pubsubAdapter: IPubSubAdapter,
   ) {
@@ -45,14 +46,10 @@ class Backend {
     opts?: Opts,
   ): Promise<QueueResponse> {
     const s = await this.locate(addr);
-    return this.queueAdapter.queue(s, request, opts);
+    return this.queueAdapter.send(s, request, opts);
   }
 
-  async listen(
-    addr: string,
-    request: Request,
-    opts?: Opts,
-  ): Promise<IMessage | null> {
+  async listen(addr: string, opts?: Opts): Promise<Poller<IQueueAdapter>> {
     const s = await this.locate(addr);
     return this.queueAdapter.listen(s, opts);
   }

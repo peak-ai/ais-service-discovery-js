@@ -15,7 +15,7 @@ class Queue implements IQueueAdapter {
     this.config = config;
   }
 
-  public async queue(
+  public async send(
     service: ServiceResponse,
     request: Request,
     opts?: Opts,
@@ -32,8 +32,8 @@ class Queue implements IQueueAdapter {
     const s = service.rid;
     const config = this.config[s];
     return {
+      id: '',
       message: config.resolve?.mockedResponse as string,
-      messageId: '',
       delete: this.delete('', service.rid),
     };
   }

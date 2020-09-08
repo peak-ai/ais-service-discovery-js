@@ -48,8 +48,10 @@ describe('(Mock Backend)', () => {
 
     const sd = WithMockBackend(config);
     const request = { body: 'Test' };
-    const actual = await sd.listen('latest.service->my-queue', request, {});
-    expect(actual?.message).toBe(response);
+    const actual = await sd.listen('latest.service->my-queue', request);
+    actual.on('message', message => {
+      expect(message?.message).toBe(response);
+    });
   });
 
   test('can publish an event', async () => {

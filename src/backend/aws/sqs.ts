@@ -3,6 +3,7 @@ import {
   Opts,
   Request,
   IMessage,
+  IEventHandler,
   QueueResponse,
   IQueueAdapter,
   ServiceResponse,
@@ -23,7 +24,7 @@ class SQS implements IQueueAdapter {
     this.opts = opts;
   }
 
-  public async queue(
+  public async send(
     service: ServiceResponse,
     request: Request,
     opts?: Opts,
@@ -42,9 +43,7 @@ class SQS implements IQueueAdapter {
       throw new Error('no message id in response from sqs');
     }
 
-    return {
-      id,
-    };
+    return { id };
   }
 
   public async listen(
@@ -61,14 +60,18 @@ class SQS implements IQueueAdapter {
     if (!Messages) return null;
     const [message] = Messages;
 
-    if (!message.Body || message.MessageId || !message.ReceiptHandle) {
+    if (
+      [message.Body, message.MessageId, message.ReceiptHandle].some(
+        (a) => a === null,
+      )
+    ) {
       return null;
     }
 
     return {
-      message: message.Body,
-      messageId: message.MessageId as string,
-      delete: this.delete(message.ReceiptHandle, service.rid),
+      id: message.MessageId as string,
+      message: message.Body as string,
+      delete: this.delete(message.ReceiptHandle as string, service.rid),
     };
   }
 
