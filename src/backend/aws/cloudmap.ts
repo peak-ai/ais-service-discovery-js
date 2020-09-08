@@ -43,7 +43,7 @@ class CloudmapAdapter implements IDiscoverAdapter {
       ServiceName: service,
       QueryParameters: this.toParams(opts),
     };
-    return this.client.discoverInstances(params, () => {}).promise();
+    return this.client.discoverInstances(params).promise();
   }
 
   public async locate(

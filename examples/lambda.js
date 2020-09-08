@@ -1,6 +1,6 @@
 const { WithAwsBackend } = require('../dist');
 
-function main() {
+async function main() {
 	try {
 		const sd = WithAwsBackend();
 		const request = {
@@ -8,12 +8,11 @@ function main() {
 				hello: 'world',
 			}),
 		};
-		return sd.request('test-namespace.test-service->my-func-instance', request, {})
-			.then(response => console.log(response))
-			.catch(console.error);
+		const response = await sd.request('test-namespace.test-service->my-func-instance', request, {})
+		return response.body;
 	} catch (e) {
 		console.error(e);
 	}
 }
 
-main();
+main().then(console.log).catch(console.error);
