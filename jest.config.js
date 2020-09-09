@@ -11,11 +11,12 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   testEnvironment: 'node',
-  testRegex: [ // I'm sure this could be nicer...
+  testRegex: [
+    // I'm sure this could be nicer...
     'src(/.*)?/.*.test.ts$',
     'src(/.*)?/.*.test.js$',
     'examples(/.*)?/.*.test.ts$',
-    'examples(/.*)?/.*.test.js$'
+    'examples(/.*)?/.*.test.js$',
   ],
   moduleFileExtensions: ['ts', 'js', 'json'],
   globals: {
