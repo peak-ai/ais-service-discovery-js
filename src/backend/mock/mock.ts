@@ -5,7 +5,7 @@ import FunctionAdapter from './function';
 import RegistryAdapter from './registry';
 import PubSubAdapter from './pubsub';
 import Backend from '../backend';
-import Poller from "../../poller/poller";
+import Poller from '../../poller/poller';
 
 // Convenience factory function
 export function WithMockBackend(config: Config) {

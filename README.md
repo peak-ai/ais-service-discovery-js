@@ -119,3 +119,16 @@ const res = await local.request('latest.service->instance', request);
 const prod = WithAWSBackend();
 await prod.queue('latest.service->instance', request);
 ```
+
+### Integration Tests
+
+#### Prerequisites
+1. AWS Account Access
+2. Run the infrastructure CDK plan, foudn in ./examples/infrastructure (follow the instructions in the README there).
+3. Ensure you have your AWS_PROFILE, and AWS_REGION env vars set correctly.
+
+
+#### Run integration tests
+```bash
+$ yarn run test:integration
+```

@@ -49,7 +49,7 @@ describe('(Mock Backend)', () => {
     const sd = WithMockBackend(config);
     const request = { body: 'Test' };
     const actual = await sd.listen('latest.service->my-queue', request);
-    actual.on('message', message => {
+    actual.on('message', (message) => {
       expect(message?.message).toBe(response);
     });
   });

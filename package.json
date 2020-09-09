@@ -23,7 +23,8 @@
     "prepublishOnly": "yarn format:check && yarn preupdate",
     "test": "jest",
     "test:dist": "jest --config jest.config.dist.js",
-    "start": "ts-node --project ./tsconfig.json examples/lambda.js"
+    "test:integration": "jest ./examples",
+    "start": "tsc -p . -w"
   },
   "devDependencies": {
     "@types/jest": "^26.0.13",
