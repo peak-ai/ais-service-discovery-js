@@ -1,4 +1,4 @@
-const { WithMockBackend } = require("../dist");
+import { WithMockBackend } from "../src";
 
 describe('(Local Backend)', () => {
   it('should', async () => {

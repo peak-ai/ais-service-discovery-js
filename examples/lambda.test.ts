@@ -1,6 +1,6 @@
-const { WithAwsBackend } = require('../dist');
-const scenarios = require('./scenarios');
-const ServiceDiscovery = require('../dist');
+import { WithAwsBackend } from '../src';
+import * as scenarios from './scenarios';
+import * as ServiceDiscovery from "../src";
 
 describe('(v3:Lambda)', () => {
 	it('should get a response from a lambda', async () => {

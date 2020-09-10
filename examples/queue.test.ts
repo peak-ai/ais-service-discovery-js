@@ -1,4 +1,4 @@
-const { WithAwsBackend } = require('../dist');
+import { WithAwsBackend } from '../src';
 
 let sd;
 beforeEach(() => {
