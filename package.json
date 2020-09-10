@@ -16,8 +16,8 @@
   },
   "scripts": {
     "lint": "eslint jest.config*js 'src/**/*.ts' 'examples/**/*.ts'",
-    "format": "prettier --write jest.config*js 'src/**/*.ts'",
-    "format:check": "prettier --check jest.config*js 'src/**/*.ts'",
+    "format": "prettier --write jest.config*js 'src/**/*.ts' 'examples/**/*.ts'",
+    "format:check": "prettier --check jest.config*js 'src/**/*.ts' 'examples/**/*.ts'",
     "build": "tsc -p .",
     "preupdate": "yarn lint && yarn build && yarn test:dist",
     "prepublishOnly": "yarn format:check && yarn preupdate",
