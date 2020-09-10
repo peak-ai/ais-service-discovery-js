@@ -1,8 +1,9 @@
 import Backend from '../src/backend/backend';
 import { Request, Response } from '../src/types';
-import { ServiceDiscovery } from 'aws-sdk';
 
-export const makeRequest = (sd: Backend, body = ''): Promise<Response> => {
+// @ts-ignore - ServiceDiscovery is legacy and not ts, just so happens
+// that it satisfies the same interface.
+export const makeRequest = (sd: any, body = ''): Promise<Response> => {
   const request = { body };
   return sd.request(
     'test-namespace.test-service->my-func-instance',
