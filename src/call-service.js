@@ -37,6 +37,8 @@ const stateMachineTrigger = new StateMachine(stateMachineAdapter);
 const ssmAdapter = new SSMAdapter(ssm);
 const automation = new Automation(ssmAdapter);
 
+const maybe = (rid, other) => (rid) ? rid : other;
+
 const runService = (service, body, opts = {}) => {
   const { type, arn, rid, url } = service.attributes;
 
@@ -44,35 +46,31 @@ const runService = (service, body, opts = {}) => {
     case 'cloud-function':
     case 'function':
     case 'lambda': {
-      if (rid) {
-        // Backwards compat for v3
-        return func.call(rid, body, opts);
-      }
-      return func.call(arn, body, opts);
+      return func.call(maybe(rid, arn), body, opts);
     }
 
     case 'step-function':
     case 'state-machine': {
-      return stateMachineTrigger.start(arn, body);
+      return stateMachineTrigger.start(maybe(rid, arn), body);
     }
 
     case 'script':
     case 'automation': {
-      return automation.run(arn, body, opts);
+      return automation.run(maybe(rid, arn), body, opts);
     }
 
     case 'queue':
     case 'sqs': {
       if (opts.subscribe) {
-        return queue.listen(url);
+        return queue.listen(maybe(rid, url));
       }
-      return queue.send(url, body, omit(['subscribe'], opts));
+      return queue.send(maybe(rid, url), body, omit(['subscribe'], opts));
     }
 
     case 'event':
     case 'pubsub':
     case 'sns': {
-      return publisher.publish(arn, body, omit(['subscribe'], opts));
+      return publisher.publish(maybe(rid, arn), body, omit(['subscribe'], opts));
     }
 
     default: {
