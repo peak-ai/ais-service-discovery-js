@@ -12,9 +12,7 @@ module.exports = {
   },
   testEnvironment: 'node',
   testRegex: [
-    // I'm sure this could be nicer...
-    'src(/.*)?/.*.test.ts$',
-    'src(/.*)?/.*.test.js$',
+    'src(/.*)?/.*.test.(ts|js)$'
   ],
   moduleFileExtensions: ['ts', 'js', 'json'],
   globals: {
