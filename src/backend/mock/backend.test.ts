@@ -1,7 +1,9 @@
 import { WithMockBackend } from './mock';
+import { IMessage, IQueueAdapter } from '../../types';
+import Poller from '../../poller/poller';
 
 describe('(Mock Backend)', () => {
-  test('can make a request', async () => {
+  it('can make a request', async () => {
     const response = JSON.stringify({ hello: 'world' });
     const config = {
       'latest.service->my-func': {
@@ -18,7 +20,7 @@ describe('(Mock Backend)', () => {
     expect(actual.body).toBe(response);
   });
 
-  test('can queue a message', async () => {
+  it('can queue a message', async () => {
     const response = 'abc123';
     const config = {
       'latest.service->my-queue': {
@@ -35,7 +37,7 @@ describe('(Mock Backend)', () => {
     expect(actual.id).toBe(response);
   });
 
-  test('can subscribe to a queue', async () => {
+  it('can subscribe to a queue', async () => {
     const response = 'message';
     const config = {
       'latest.service->my-queue': {
@@ -47,14 +49,25 @@ describe('(Mock Backend)', () => {
     };
 
     const sd = WithMockBackend(config);
-    const request = { body: 'Test' };
-    const actual = await sd.listen('latest.service->my-queue', request);
-    actual.on('message', (message) => {
-      expect(message?.message).toBe(response);
-    });
+    const results = await sd.listen('latest.service->my-queue');
+    const listen = (results: Poller<IQueueAdapter>) =>
+      new Promise((resolve, reject) => {
+        results.on('message', (message: IMessage | null) => {
+          results.stop();
+          if (message) {
+            resolve(message);
+            return;
+          }
+
+          reject(new Error('no message found'));
+        });
+      });
+
+    const result = await listen(results);
+    expect((result as IMessage)?.message).toBe(response);
   });
 
-  test('can publish an event', async () => {
+  it('can publish an event', async () => {
     const response = 'message-id';
     const config = {
       'latest.service->my-topic': {

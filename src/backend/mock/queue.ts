@@ -10,9 +10,11 @@ import { Config } from './types';
 
 class Queue implements IQueueAdapter {
   private readonly config: Config;
+  private messages: Request[] = [];
 
   constructor(config: Config) {
     this.config = config;
+    this.messages = [];
   }
 
   public async send(
@@ -22,6 +24,7 @@ class Queue implements IQueueAdapter {
   ): Promise<QueueResponse> {
     const s = service.rid;
     const config = this.config[s];
+    this.messages.push(request);
     return { id: config.resolve.mockedResponse as string };
   }
 
@@ -31,9 +34,14 @@ class Queue implements IQueueAdapter {
   ): Promise<IMessage | null> {
     const s = service.rid;
     const config = this.config[s];
+
+    // Use the next message that was sent, or fallback
+    // to the mocked response, this allows us to mock
+    // 'sends' in the same process, also.
+    const [nextMessage] = this.messages;
     return {
       id: '',
-      message: config.resolve?.mockedResponse as string,
+      message: nextMessage?.body || (config.resolve?.mockedResponse as string),
       delete: this.delete('', service.rid),
     };
   }

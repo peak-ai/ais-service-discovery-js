@@ -14,11 +14,7 @@ class CloudmapAdapter implements IDiscoverAdapter {
     this.client = client;
   }
 
-  private toParams(opts?: Opts): AWS.ServiceDiscovery.Attributes {
-    if (!opts) {
-      return {};
-    }
-
+  private toParams(opts: Opts = {}): AWS.ServiceDiscovery.Attributes {
     const o = Object.entries(opts);
     return o.reduce((a, b) => {
       const [key, value] = b;

@@ -14,8 +14,7 @@ class SNS implements IPubSubAdapter {
     this.client = client;
   }
 
-  convertAttributes(opts?: Opts): AWS.SNS.MessageAttributeMap {
-    if (!opts) return {};
+  private convertAttributes(opts: Opts = {}): AWS.SNS.MessageAttributeMap {
     const kv = Object.entries(opts);
     return kv.reduce((a, b) => {
       const [key, value] = b;
@@ -26,7 +25,7 @@ class SNS implements IPubSubAdapter {
     }, {});
   }
 
-  async publish(
+  public async publish(
     service: ServiceResponse,
     request: Request,
     opts?: Opts,
@@ -51,7 +50,7 @@ class SNS implements IPubSubAdapter {
     };
   }
 
-  async subscribe(
+  public async subscribe(
     service: ServiceResponse,
     request: Request,
     opts?: Opts,

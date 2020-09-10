@@ -22,22 +22,24 @@ class Poller<T extends IQueueAdapter> extends EventEmitter {
 
   private async poll(name: ServiceResponse, opts?: Opts) {
     if (this.stopped) {
-      return;
+      return null;
     }
 
     try {
       const message = await this.adapter.listen(name, opts);
       if (message) {
         this.emit('message', message);
-        return;
+      } else {
+        this.emit('empty');
       }
-      this.emit('empty');
     } catch (e) {
       this.emit('error', e);
     }
 
-    this.poll.call(this, name);
-    return;
+    setTimeout(() => {
+      this.poll.call(this, name);
+    }, 100);
+    return null;
   }
 
   public send<S>(
