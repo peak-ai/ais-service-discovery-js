@@ -1,13 +1,13 @@
 import { WithAwsBackend } from '../src';
 import * as scenarios from './scenarios';
-import * as ServiceDiscovery from "../src";
+import * as ServiceDiscovery from '../src';
 
 describe('(v3:Lambda)', () => {
-	it('should get a response from a lambda', async () => {
+  it('should get a response from a lambda', async () => {
     const sd = WithAwsBackend();
     const response = await scenarios.makeRequest(sd);
     expect(response.body).toEqual('test');
-	});
+  });
 });
 
 describe('(v2:Lambda)', () => {

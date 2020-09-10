@@ -1,4 +1,4 @@
-import { WithMockBackend } from "../src";
+import { WithMockBackend } from '../src';
 
 describe('(Local Backend)', () => {
   it('should', async () => {
@@ -11,13 +11,17 @@ describe('(Local Backend)', () => {
       },
     };
     const sd = WithMockBackend(config);
-  
+
     const request = {
       body: JSON.stringify({
         hello: 'world',
       }),
     };
-    const response = await sd.request('namespace.service->instance', request, {});
+    const response = await sd.request(
+      'namespace.service->instance',
+      request,
+      {},
+    );
     expect(response.body).toEqual('This is a test');
   });
 });
