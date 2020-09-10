@@ -25,11 +25,8 @@ class LambdaAdapter implements IFunctionAdapter {
       Payload: JSON.stringify(request.body),
     };
 
-    return {
-      body: 'test',
-    };
-    // const { Payload: payload, StatusCode: statusCode } = await this.client.invoke(params).promise();
-    // return payload ? JSON.parse(payload.toString()) : statusCode;
+    const { Payload: payload, StatusCode: statusCode } = await this.client.invoke(params).promise();
+    return payload ? JSON.parse(payload.toString()) : statusCode;
   }
 }
 

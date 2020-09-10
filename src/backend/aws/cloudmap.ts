@@ -51,10 +51,13 @@ class CloudmapAdapter implements IDiscoverAdapter {
     opts?: Opts,
   ): Promise<ServiceResponse> {
     const { namespace, service, instance } = serviceRequest;
+
+    // Find the service
     const res = await this.discover(namespace, service, opts);
     if (!res?.Instances)
       throw new Error(`no service found: ${namespace}.${service}->${instance}`);
 
+    // Filter down to the specific instance
     const i = res.Instances.find((item) => item.InstanceId === instance);
     if (!i) {
       throw new Error('no valid instance found with given instance id');

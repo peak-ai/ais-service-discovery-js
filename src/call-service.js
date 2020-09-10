@@ -38,12 +38,16 @@ const ssmAdapter = new SSMAdapter(ssm);
 const automation = new Automation(ssmAdapter);
 
 const runService = (service, body, opts = {}) => {
-  const { type, arn, url } = service.attributes;
+  const { type, arn, rid, url } = service.attributes;
 
   switch (type) {
     case 'cloud-function':
     case 'function':
     case 'lambda': {
+      if (rid) {
+        // Backwards compat for v3
+        return func.call(rid, body, opts);
+      }
       return func.call(arn, body, opts);
     }
 

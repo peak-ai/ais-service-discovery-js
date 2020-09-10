@@ -23,7 +23,7 @@
     "prepublishOnly": "yarn format:check && yarn preupdate",
     "test": "jest",
     "test:dist": "jest --config jest.config.dist.js",
-    "test:integration": "jest ./examples",
+    "test:integration": "jest --config jest.integration.js ./examples",
     "start": "tsc -p . -w"
   },
   "devDependencies": {
