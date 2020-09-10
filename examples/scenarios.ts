@@ -1,4 +1,8 @@
-export const makeRequest = (sd, body = '') => {
+import Backend from '../src/backend/backend';
+import { Request, Response } from '../src/types';
+import { ServiceDiscovery } from 'aws-sdk';
+
+export const makeRequest = (sd: Backend, body = ''): Promise<Response> => {
   const request = { body };
   return sd.request(
     'test-namespace.test-service->my-func-instance',
@@ -7,13 +11,14 @@ export const makeRequest = (sd, body = '') => {
   );
 };
 
-const expectUUID = u => expect(u).toEqual(
+const expectUUID = (u: string) =>
+  expect(u).toEqual(
     expect.stringMatching(
       /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
     ),
   );
 
-export const queueMessage = async (sd, message) => {
+export const queueMessage = async (sd: Backend, message: Request) => {
   const response = await sd.queue(
     'test-namespace.test-service->my-queue-instance',
     message,
@@ -23,7 +28,8 @@ export const queueMessage = async (sd, message) => {
   return response;
 };
 
-export const queueMessageLegacy = async (sd, message) => {
+// @ts-ignore
+export const queueMessageLegacy = async (sd: any, message: Request) => {
   const response = await sd.queue(
     'test-namespace.test-service->my-queue-instance',
     message,
@@ -33,9 +39,9 @@ export const queueMessageLegacy = async (sd, message) => {
   expectUUID(response.MessageId);
 
   return response;
-}
+};
 
-export const listenForMessage = async (sd) => {
+export const listenForMessage = async (sd: Backend) => {
   const results = await sd.listen(
     'test-namespace.test-service->my-queue-instance',
   );
