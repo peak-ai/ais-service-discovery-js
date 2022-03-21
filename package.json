@@ -1,6 +1,6 @@
 {
   "name": "@peak-ai/ais-service-discovery",
-  "version": "0.3.0-rc1",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "git@github.com:peak-ai/ais-service-discovery-js.git",
