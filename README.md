@@ -131,7 +131,9 @@ Example:
 const { call } = require('@peak-ai/ais-service-discovery');
 
 await call({
+      namespace,
       service: 'segment-explorer',
       instance: 'segment-explorer-refresh-segment',
+      body
 )}
 ```
