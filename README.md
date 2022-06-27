@@ -133,7 +133,7 @@ const { call } = require('@peak-ai/ais-service-discovery');
 await call({
       namespace,
       service: 'segment-explorer',
-      instance: 'segment-explorer-refresh-segment',
+      instance: 'ais-service-segment-explorer-<stage>-refresh-segment',
       body
 )}
 ```
