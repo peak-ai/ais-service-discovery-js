@@ -121,3 +121,19 @@ await prod.queue('latest.service->instance', request);
 ```bash
 $ yarn run test:integration
 ```
+
+## Migrating from `0.0.11-alpha` to `0.3.0`
+
+With the newer release `call` function now expects arn of `ServiceDiscovery instance` over a `lambda handler`
+
+Example:
+```
+const { call } = require('@peak-ai/ais-service-discovery');
+
+await call({
+      namespace,
+      service: 'segment-explorer',
+      instance: 'ais-service-segment-explorer-<stage>-refresh-segment',
+      body
+)}
+```
