@@ -11,8 +11,22 @@ class LambdaAdapter {
       FunctionName: name,
       Payload: JSON.stringify(body),
     };
-    const { Payload, StatusCode } = await this.client.invoke(params).promise();
-    return Payload ? JSON.parse(Payload) : StatusCode;
+    const { Payload, StatusCode } = await this.client.invoke(params);
+
+    // Check if the payload exists and if the status code indicates success
+    if (Payload && StatusCode === 200) {
+     
+        // Decode Uint8Array to string using 'utf-8' encoding
+        const decoder = new TextDecoder('utf-8');
+        const decodedPayload = decoder.decode(Payload);
+
+        // Attempt to parse the decoded payload as JSON
+        return JSON.parse(decodedPayload);
+     
+    } else {
+      // Handle different or error status codes as needed
+      return StatusCode;
+    }
   }
 }
 

@@ -61,7 +61,7 @@ describe('(call)', () => {
 
   it('should call a lambda function', async () => {
     const expected = { name: 'test' };
-    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
+    CloudmapAdapter.prototype.locate = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
     LambdaAdapter.prototype.call = jest.fn().mockImplementation(() => Promise.resolve(expected));
     expect.assertions(1);
     const body = { name: 'Ewan' };
@@ -75,7 +75,7 @@ describe('(call)', () => {
 
   it('should call a lambda using a service id', async () => {
     const expected = { name: 'test' };
-    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
+    CloudmapAdapter.prototype.locate = jest.fn().mockReturnValue(Promise.resolve(lambdaService));
     LambdaAdapter.prototype.call = jest.fn().mockImplementation(() => Promise.resolve(expected));
     expect.assertions(1);
     const body = { name: 'Ewan' };
@@ -85,7 +85,7 @@ describe('(call)', () => {
 
   it('should publish an sns event', async () => {
     const messageId = 'abc123';
-    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(snsService));
+    CloudmapAdapter.prototype.locate = jest.fn().mockReturnValue(Promise.resolve(snsService));
     SNS.prototype.publish = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: messageId,
     }));
@@ -101,7 +101,7 @@ describe('(call)', () => {
 
   it('should publish an sns event with MessageAttributes if present in the options', async () => {
     const messageId = 'abc123';
-    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(snsService));
+    CloudmapAdapter.prototype.locate = jest.fn().mockReturnValue(Promise.resolve(snsService));
     SNS.prototype.publish = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: messageId,
     }));
@@ -136,7 +136,7 @@ describe('(call)', () => {
     const mockMessageId = 'abc123';
     const opts = { MessageGroupId: 'abc123', MessageDeduplicationId: 'abc123' };
 
-    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(sqsService));
+    CloudmapAdapter.prototype.locate = jest.fn().mockReturnValue(Promise.resolve(sqsService));
     SQS.prototype.send = jest.fn().mockImplementation(() => Promise.resolve({
       MessageId: mockMessageId,
     }));
@@ -147,7 +147,7 @@ describe('(call)', () => {
 
     const mockDelete = jest.fn();
 
-    CloudmapAdapter.prototype.find = jest.fn().mockReturnValue(Promise.resolve(sqsService));
+    CloudmapAdapter.prototype.locate = jest.fn().mockReturnValue(Promise.resolve(sqsService));
     SQS.prototype.listen = jest.fn().mockImplementation(() => Promise.resolve({
       message,
       delete: mockDelete,
@@ -193,7 +193,7 @@ describe('(call)', () => {
 
   it('should start a state machine', async (done) => {
     const expected = { name: 'testing' };
-    CloudmapAdapter.prototype.find = jest.fn()
+    CloudmapAdapter.prototype.locate = jest.fn()
       .mockReturnValue(Promise.resolve(stateMachineService));
     StepFunctionAdapter.prototype.start = jest.fn().mockReturnValue(Promise.resolve(expected));
     const body = { name: 'test', tenant: 'mock' };
@@ -210,7 +210,7 @@ describe('(call)', () => {
 
   it('should run an automation task', async (done) => {
     const expected = { name: 'testing' };
-    CloudmapAdapter.prototype.find = jest.fn()
+    CloudmapAdapter.prototype.locate = jest.fn()
       .mockReturnValue(Promise.resolve(automationService));
     SSMAdapter.prototype.run = jest.fn().mockReturnValue(Promise.resolve(expected));
     const body = { name: 'test', tenant: 'mock' };

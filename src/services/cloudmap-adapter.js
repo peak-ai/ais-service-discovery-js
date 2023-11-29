@@ -5,28 +5,52 @@ class CloudmapAdapter {
     this.client = client;
   }
 
-  /*
-   * Discover will find multiple instances by a specified
-   * object containing metadata registered against an instance.
-   */
-  discover(namespace, service, queryParams = {}) {
+  toParams(opts = {}) {
+    const o = Object.entries(opts);
+    return o.reduce((a, b) => {
+      const [key, value] = b;
+      return { ...a, [key]: value.toString() };
+    }, {});
+  }
+
+  discover(namespace, service, opts = {}) {
     const params = {
       NamespaceName: namespace,
       ServiceName: service,
-      QueryParameters: queryParams,
+      QueryParameters: this.toParams(opts),
     };
-    return this.client.discoverInstances(params).promise();
+    return this.client.discoverInstances(params);
   }
 
-  /**
-   * Finds a single instance by id.
-   */
-  async find(namespace, service, instance, params = {}) {
-    const res = await this.discover(namespace, service, params);
+  async locate(serviceRequest, opts = {}) {
+    const { namespace, service, instance } = serviceRequest;
+
+    const res = await this.discover(namespace, service, opts);
+    if (!res || !res.Instances) {
+      throw new Error(`no service found: ${namespace}.${service}->${instance}`);
+    }
+
     const i = res.Instances.find(item => item.InstanceId === instance);
-    if (!i) throw new Error(`no service found: ${namespace}.${service}->${instance}`);
+    if (!i) {
+      throw new Error('no valid instance found with given instance id');
+    }
+
+    const attributes = i.Attributes;
+    if (!attributes) {
+      throw new Error('no attributes found, we need these to find a usable resource id');
+    }
+
+    const identifiers = [
+      attributes['id'],
+      attributes['arn'],
+      attributes['url'],
+      attributes['rid'],
+    ];
+
+    const rid = identifiers.find(a => a !== undefined);
+
     return {
-      id: instance,
+      rid: rid,
       attributes: i.Attributes,
     };
   }

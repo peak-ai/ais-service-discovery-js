@@ -10,7 +10,7 @@ class StepFunctionAdapter {
       stateMachineArn: arn,
       input: JSON.stringify(body),
     };
-    const result = await this.client.startExecution(params).promise();
+    const result = await this.client.startExecution(params);
     return result;
   }
 }
