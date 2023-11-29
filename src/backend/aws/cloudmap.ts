@@ -1,20 +1,22 @@
 import {
+  DiscoverInstancesCommandOutput,
+  ServiceDiscovery,
+} from '@aws-sdk/client-servicediscovery';
+import {
   Opts,
   ServiceResponse,
   IDiscoverAdapter,
   ServiceRequest,
 } from '../../types';
 
-import AWS from 'aws-sdk';
-
 class CloudmapAdapter implements IDiscoverAdapter {
-  private readonly client: AWS.ServiceDiscovery;
+  private readonly client: ServiceDiscovery;
 
-  constructor(client: AWS.ServiceDiscovery) {
+  constructor(client: ServiceDiscovery) {
     this.client = client;
   }
 
-  private toParams(opts: Opts = {}): AWS.ServiceDiscovery.Attributes {
+  private toParams(opts: Opts = {}): Record<string, string> {
     const o = Object.entries(opts);
     return o.reduce((a, b) => {
       const [key, value] = b;
@@ -33,13 +35,13 @@ class CloudmapAdapter implements IDiscoverAdapter {
     namespace: string,
     service: string,
     opts?: Opts,
-  ): Promise<AWS.ServiceDiscovery.DiscoverInstancesResponse> {
+  ): Promise<DiscoverInstancesCommandOutput> {
     const params = {
       NamespaceName: namespace,
       ServiceName: service,
       QueryParameters: this.toParams(opts),
     };
-    return this.client.discoverInstances(params).promise();
+    return this.client.discoverInstances(params);
   }
 
   public async locate(

@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { SQS as AWSSQS } from '@aws-sdk/client-sqs';
 import {
   Opts,
   Request,
@@ -16,10 +16,10 @@ type SQSOpts = {
 };
 
 class SQS implements IQueueAdapter {
-  private readonly client: AWS.SQS;
+  private readonly client: AWSSQS;
   private opts?: SQSOpts;
 
-  constructor(client: AWS.SQS, opts?: SQSOpts) {
+  constructor(client: AWSSQS, opts?: SQSOpts) {
     this.client = client;
     this.opts = opts;
   }
@@ -29,13 +29,11 @@ class SQS implements IQueueAdapter {
     request: Request,
     opts?: Opts,
   ): Promise<QueueResponse> {
-    const res = await this.client
-      .sendMessage({
-        QueueUrl: service.rid,
-        MessageBody: JSON.stringify(request),
-        ...opts,
-      })
-      .promise();
+    const res = await this.client.sendMessage({
+      QueueUrl: service.rid,
+      MessageBody: JSON.stringify(request),
+      ...opts,
+    });
 
     const id = res.MessageId;
 
@@ -50,13 +48,11 @@ class SQS implements IQueueAdapter {
     service: ServiceResponse,
     opts?: Opts,
   ): Promise<IMessage | null> {
-    const { Messages } = await this.client
-      .receiveMessage({
-        QueueUrl: service.rid,
-        WaitTimeSeconds:
-          (opts?.interval as number) || this.opts?.interval || DEFAULT_INTERVAL,
-      })
-      .promise();
+    const { Messages } = await this.client.receiveMessage({
+      QueueUrl: service.rid,
+      WaitTimeSeconds:
+        (opts?.interval as number) || this.opts?.interval || DEFAULT_INTERVAL,
+    });
     if (!Messages) return null;
     const [message] = Messages;
 
@@ -77,12 +73,10 @@ class SQS implements IQueueAdapter {
 
   public delete(receipt: string, url: string): () => Promise<void> {
     return async () => {
-      await this.client
-        .deleteMessage({
-          QueueUrl: url,
-          ReceiptHandle: receipt,
-        })
-        .promise();
+      await this.client.deleteMessage({
+        QueueUrl: url,
+        ReceiptHandle: receipt,
+      });
     };
   }
 }

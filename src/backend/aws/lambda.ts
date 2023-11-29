@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { Lambda } from '@aws-sdk/client-lambda';
 import {
   Opts,
   Request,
@@ -8,9 +8,9 @@ import {
 } from '../../types';
 
 class LambdaAdapter implements IFunctionAdapter {
-  private client: AWS.Lambda;
+  private client: Lambda;
 
-  constructor(client: AWS.Lambda) {
+  constructor(client: Lambda) {
     this.client = client;
   }
 
@@ -28,7 +28,7 @@ class LambdaAdapter implements IFunctionAdapter {
     const {
       Payload: payload,
       StatusCode: statusCode,
-    } = await this.client.invoke(params).promise();
+    } = await this.client.invoke(params);
     return payload ? JSON.parse(payload.toString()) : statusCode;
   }
 }
