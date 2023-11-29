@@ -1,16 +1,23 @@
 'use strict';
+const { Lambda: AWSLambda} = require('@aws-sdk/client-lambda')
+const { SQS: AWSSQS} = require('@aws-sdk/client-sqs')
+const { SNS: AWSSNS} = require('@aws-sdk/client-sns')
+const { SSM: AWSSSM} = require('@aws-sdk/client-ssm')
+const {SFNClient} = require('@aws-sdk/client-sfn')
+const { ServiceDiscovery: AWSServiceDiscovery} = require('@aws-sdk/client-servicediscovery')
 
-const AWS = require('aws-sdk');
+
+
 const { omit } = require('ramda');
 
 const { defaultNamespace, extractServiceParts } = require('./helpers/call-service-helper');
 
-const lambda = new AWS.Lambda();
-const sqs = new AWS.SQS();
-const sns = new AWS.SNS();
-const ssm = new AWS.SSM();
-const stateMachine = new AWS.StepFunctions();
-const serviceDiscovery = new AWS.ServiceDiscovery();
+const lambda = new AWSLambda();
+const sqs = new AWSSQS();
+const sns = new AWSSNS();
+const ssm = new AWSSSM();
+const stateMachine = new SFNClient();
+const serviceDiscovery = new AWSServiceDiscovery();
 
 const { SNS, Publisher } = require('./events');
 const { SQS, Queue } = require('./queue');

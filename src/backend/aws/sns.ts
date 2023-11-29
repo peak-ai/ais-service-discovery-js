@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { MessageAttributeValue, SNS as AWSSNS } from '@aws-sdk/client-sns';
 import {
   IPubSubAdapter,
   Request,
@@ -8,13 +8,15 @@ import {
 } from '../../types';
 
 class SNS implements IPubSubAdapter {
-  private client: AWS.SNS;
+  private client: AWSSNS;
 
-  constructor(client: AWS.SNS) {
+  constructor(client: AWSSNS) {
     this.client = client;
   }
 
-  private convertAttributes(opts: Opts = {}): AWS.SNS.MessageAttributeMap {
+  private convertAttributes(
+    opts: Opts = {},
+  ): Record<string, MessageAttributeValue> {
     const kv = Object.entries(opts);
     return kv.reduce((a, b) => {
       const [key, value] = b;
@@ -30,24 +32,24 @@ class SNS implements IPubSubAdapter {
     request: Request,
     opts?: Opts,
   ): Promise<PubSubResponse> {
-    const { MessageId } = await this.client
-      .publish(
-        {
-          TopicArn: service.rid,
-          Message: JSON.stringify(request.body),
-          MessageAttributes: this.convertAttributes(opts),
-        },
-        () => {},
-      )
-      .promise();
+    try {
+      const response = await this.client.publish({
+        TopicArn: service.rid,
+        Message: JSON.stringify(request.body),
+        MessageAttributes: this.convertAttributes(opts),
+      });
 
-    if (!MessageId) {
-      throw new Error('missing message id in response');
+      if (!response.MessageId) {
+        throw new Error('Missing message ID in response');
+      }
+
+      return {
+        messageId: response.MessageId,
+      };
+    } catch (err) {
+      // Handle the error appropriately
+      throw new Error(`Failed to publish to SNS topic: ${err}`);
     }
-
-    return {
-      messageId: MessageId,
-    };
   }
 
   public async subscribe(
@@ -60,19 +62,23 @@ class SNS implements IPubSubAdapter {
       protocol = opts['protocol'] as string;
     }
 
-    const response = await this.client
-      .subscribe(
-        {
-          TopicArn: service.rid,
-          Protocol: protocol,
-        },
-        () => {},
-      )
-      .promise();
+    try {
+      const response = await this.client.subscribe({
+        TopicArn: service.rid,
+        Protocol: protocol,
+      });
 
-    return {
-      rid: response.SubscriptionArn,
-    };
+      if (!response.SubscriptionArn) {
+        throw new Error('Missing subscription ARN in response');
+      }
+
+      return {
+        rid: response.SubscriptionArn,
+      };
+    } catch (err) {
+      // Handle the error appropriately
+      throw new Error(`Failed to subscribe to SNS topic: ${err}`);
+    }
   }
 }
 
