@@ -50,12 +50,6 @@ const maybe = (rid, other) => (rid) ? rid : other;
 const runService = (service, body, opts = {}) => {
   const { type, arn, rid, url } = service.attributes;
 
-  console.log('service;', service)
-  console.log('body;', body)
-  console.log('opts;', opts)
-
-  console.log('calling this functionality: ', type)
-
   switch (type) {
     case 'cloud-function':
     case 'function':
@@ -105,16 +99,9 @@ const callService = ({
       throw new Error(`couldn't find a service with instance id or instance name: ${instance}`);
     }
 
-    console.log('in callService;', service)
-
-    console.log('service;', service)
-    console.log('body;', body)
-    console.log('opts;', opts)
-
     return runService(foundInstance, body, opts)
       .then((payload) => {
 
-        console.log('payload: ',payload)
         if (payload && payload.errorMessage && payload.errorType) {
           throw payload;
         }

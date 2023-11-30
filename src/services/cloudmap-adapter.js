@@ -1,5 +1,7 @@
 'use strict';
 
+const { DiscoverInstancesCommand } = require('@aws-sdk/client-servicediscovery');
+
 class CloudmapAdapter {
   constructor(client) {
     this.client = client;
@@ -19,7 +21,10 @@ class CloudmapAdapter {
       ServiceName: service,
       QueryParameters: this.toParams(opts),
     };
-    return this.client.discoverInstances(params);
+
+    const command = new DiscoverInstancesCommand(params);
+    // send() returns a Promise, maintaining the async nature of the original method
+    return this.client.send(command);
   }
 
   async locate(serviceRequest, opts = {}) {
