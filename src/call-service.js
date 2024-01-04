@@ -49,6 +49,11 @@ const maybe = (rid, other) => (rid) ? rid : other;
 const runService = (service, body, opts = {}) => {
   const { type, arn, rid, url } = service.attributes;
 
+  console.log('service;', service)
+  console.log('body;', body)
+  console.log('opts;', opts)
+
+  console.log('calling this functionality: ', type)
   switch (type) {
     case 'cloud-function':
     case 'function':
