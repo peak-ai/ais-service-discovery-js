@@ -12,14 +12,14 @@ class SQS {
       QueueUrl: name,
       MessageBody: JSON.stringify(event),
       ...opts,
-    }).promise();
+    });
   }
 
   async listen(name) {
     const { Messages } = await this.client.receiveMessage({
       QueueUrl: name,
       WaitTimeSeconds: this.opts.interval || DEFAULT_INTERVAL,
-    }).promise();
+    });
     if (!Messages) return null;
     const [message] = Messages;
     return {
@@ -33,7 +33,7 @@ class SQS {
     return () => this.client.deleteMessage({
       QueueUrl: url,
       ReceiptHandle: receipt,
-    }).promise();
+    });
   }
 }
 

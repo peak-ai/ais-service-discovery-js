@@ -11,7 +11,7 @@ class SSMAdapter {
       InstanceIds: body.instanceIds,
     };
     if (params) ssmParams.Parameters = params;
-    return this.client.sendCommand(ssmParams).promise();
+    return this.client.sendCommand(ssmParams);
   }
 }
 

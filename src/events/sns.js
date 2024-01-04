@@ -10,14 +10,14 @@ class SNS {
       TopicArn: name,
       Message: JSON.stringify(event),
       MessageAttributes: attributes,
-    }).promise();
+    });
     return MessageId;
   }
 
   subscribe(name) {
     return this.client.subscribe({
       TopicArn: name,
-    }).promise();
+    });
   }
 }
 
