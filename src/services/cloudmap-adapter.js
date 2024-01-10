@@ -9,13 +9,14 @@ class CloudmapAdapter {
    * Discover will find multiple instances by a specified
    * object containing metadata registered against an instance.
    */
-  discover(namespace, service, queryParams = {}) {
+  async discover(namespace, service, queryParams = {}) {
     const params = {
       NamespaceName: namespace,
       ServiceName: service,
       QueryParameters: queryParams,
     };
-    return this.client.discoverInstances(params).promise();
+
+    return await this.client.discoverInstances(params)
   }
 
   /**

@@ -1,4 +1,7 @@
-import * as AWS from 'aws-sdk';
+import { Lambda } from '@aws-sdk/client-lambda';
+import { ServiceDiscovery } from '@aws-sdk/client-servicediscovery';
+import { SNS } from '@aws-sdk/client-sns';
+import { SQS } from '@aws-sdk/client-sqs';
 import Backend from '../backend';
 
 import SNSAdapter from './sns';
@@ -12,9 +15,9 @@ import Poller from '../../poller/poller';
 export function WithAwsBackend() {
   return new Backend(
     new DefaultAddressParser(),
-    new CloudmapDiscoverAdapter(new AWS.ServiceDiscovery()),
-    new Poller(new SQSAdapter(new AWS.SQS())),
-    new LambdaAdapter(new AWS.Lambda()),
-    new SNSAdapter(new AWS.SNS()),
+    new CloudmapDiscoverAdapter(new ServiceDiscovery()),
+    new Poller(new SQSAdapter(new SQS())),
+    new LambdaAdapter(new Lambda()),
+    new SNSAdapter(new SNS()),
   );
 }
