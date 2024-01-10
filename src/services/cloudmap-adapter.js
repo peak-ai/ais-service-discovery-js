@@ -16,9 +16,7 @@ class CloudmapAdapter {
       QueryParameters: queryParams,
     };
 
-    const res = await this.client.discoverInstances(params)
-
-    return res
+    return await this.client.discoverInstances(params)
   }
 
   /**
