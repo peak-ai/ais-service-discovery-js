@@ -1,6 +1,6 @@
 {
   "name": "@peak-ai/ais-service-discovery",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "git@github.com:peak-ai/ais-service-discovery-js.git",
@@ -49,6 +49,7 @@
     "@aws-sdk/client-sns": "^3.461.0",
     "@aws-sdk/client-sqs": "^3.461.0",
     "@aws-sdk/client-ssm": "^3.461.0",
-    "ramda": "^0.27.2"
+    "ramda": "^0.27.2",
+    "@aws-sdk/node-http-handler": "^3.374.0"
   }
 }

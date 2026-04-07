@@ -5,14 +5,25 @@ const { SNS: AWSSNS} = require('@aws-sdk/client-sns')
 const { SSM: AWSSSM} = require('@aws-sdk/client-ssm')
 const {SFNClient} = require('@aws-sdk/client-sfn')
 const { ServiceDiscovery: AWSServiceDiscovery} = require('@aws-sdk/client-servicediscovery')
-
-
+const { NodeHttpHandler } = require('@aws-sdk/node-http-handler')
+const https = require('https')
 
 const { omit } = require('ramda');
 
 const { defaultNamespace, extractServiceParts } = require('./helpers/call-service-helper');
 
-const lambda = new AWSLambda();
+const lambda = new AWSLambda({
+  requestHandler: new NodeHttpHandler({
+    httpsAgent: new https.Agent({
+      keepAlive: true,
+      maxSockets: 50,
+    }),
+    connectionTimeout: 8000,
+    socketTimeout: 8000,
+  }),
+  maxAttempts: 3,
+  retryMode: 'adaptive'
+});
 const sqs = new AWSSQS();
 const sns = new AWSSNS();
 const ssm = new AWSSSM();
