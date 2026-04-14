@@ -109,6 +109,36 @@ const prod = WithAWSBackend();
 await prod.queue('latest.service->instance', request);
 ```
 
+### Local Package Testing
+
+To test changes locally without publishing to a registry:
+
+#### 1. Build and pack
+```bash
+npm run build
+npm pack
+# Creates peak-ai-ais-service-discovery-<version>.tgz
+```
+
+#### 2. Install in your consuming project
+```bash
+cd /path/to/your-project
+npm install /path/to/ais-service-discovery-js/peak-ai-ais-service-discovery-<version>.tgz
+```
+
+> If you hit peer dependency conflicts, add `--legacy-peer-deps`.
+
+#### 3. Verify the install
+```javascript
+const sd = require('@peak-ai/ais-service-discovery');
+console.log(sd); // should print the module exports
+```
+
+#### 4. Revert when done
+```bash
+npm install @peak-ai/ais-service-discovery@<original-version>
+```
+
 ### Integration Tests
 
 #### Prerequisites
