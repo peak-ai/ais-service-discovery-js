@@ -1,8 +1,8 @@
 'use strict';
 
 const { Lambda } = require('@aws-sdk/client-lambda');
-const { NodeHttpHandler } = require('@aws-sdk/node-http-handler');
-const https = require('https');
+
+const { makeAwsClient } = require('../aws-client-config');
 
 class LambdaAdapter {
   constructor(client) {
@@ -14,18 +14,7 @@ class LambdaAdapter {
     if (this.clientCache.has(maxSockets)) {
       return this.clientCache.get(maxSockets);
     }
-    const client = new Lambda({
-      requestHandler: new NodeHttpHandler({
-        httpsAgent: new https.Agent({
-          keepAlive: true,
-          maxSockets,
-        }),
-        connectionTimeout: 8000,
-        socketTimeout: 8000,
-      }),
-      maxAttempts: 3,
-      retryMode: 'adaptive',
-    });
+    const client = makeAwsClient(Lambda, { maxSockets });
     this.clientCache.set(maxSockets, client);
     return client;
   }
@@ -40,9 +29,9 @@ class LambdaAdapter {
     };
     const { Payload, StatusCode } = await client.invoke(params);
 
-     // Convert Uint8Array to String
-     const decoder = new TextDecoder('utf-8');
-     const resString = decoder.decode(Payload);
+    // Convert Uint8Array to String
+    const decoder = new TextDecoder('utf-8');
+    const resString = decoder.decode(Payload);
 
     return Payload ? JSON.parse(resString) : StatusCode;
   }

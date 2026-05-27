@@ -1,34 +1,22 @@
 'use strict';
-const { Lambda: AWSLambda} = require('@aws-sdk/client-lambda')
-const { SQS: AWSSQS} = require('@aws-sdk/client-sqs')
-const { SNS: AWSSNS} = require('@aws-sdk/client-sns')
-const { SSM: AWSSSM} = require('@aws-sdk/client-ssm')
-const {SFNClient} = require('@aws-sdk/client-sfn')
-const { ServiceDiscovery: AWSServiceDiscovery} = require('@aws-sdk/client-servicediscovery')
-const { NodeHttpHandler } = require('@aws-sdk/node-http-handler')
-const https = require('https')
+const { Lambda: AWSLambda } = require('@aws-sdk/client-lambda');
+const { SQS: AWSSQS } = require('@aws-sdk/client-sqs');
+const { SNS: AWSSNS } = require('@aws-sdk/client-sns');
+const { SSM: AWSSSM } = require('@aws-sdk/client-ssm');
+const { SFNClient } = require('@aws-sdk/client-sfn');
+const { ServiceDiscovery: AWSServiceDiscovery } = require('@aws-sdk/client-servicediscovery');
 
 const { omit } = require('ramda');
 
+const { makeAwsClient } = require('./aws-client-config');
 const { defaultNamespace, extractServiceParts } = require('./helpers/call-service-helper');
 
-const lambda = new AWSLambda({
-  requestHandler: new NodeHttpHandler({
-    httpsAgent: new https.Agent({
-      keepAlive: true,
-      maxSockets: 50,
-    }),
-    connectionTimeout: 8000,
-    socketTimeout: 8000,
-  }),
-  maxAttempts: 3,
-  retryMode: 'adaptive'
-});
-const sqs = new AWSSQS();
-const sns = new AWSSNS();
-const ssm = new AWSSSM();
-const stateMachine = new SFNClient();
-const serviceDiscovery = new AWSServiceDiscovery();
+const lambda = makeAwsClient(AWSLambda);
+const sqs = makeAwsClient(AWSSQS);
+const sns = makeAwsClient(AWSSNS);
+const ssm = makeAwsClient(AWSSSM);
+const stateMachine = makeAwsClient(SFNClient);
+const serviceDiscovery = makeAwsClient(AWSServiceDiscovery);
 
 const { SNS, Publisher } = require('./events');
 const { SQS, Queue } = require('./queue');
