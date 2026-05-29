@@ -3,3 +3,4 @@ _test.js
 .idea
 lib
 dist
+.npmrc
